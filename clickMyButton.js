@@ -18,6 +18,8 @@ if( !object.empty() ){
     } )
 }*/
 
+setScreenMetrics(1080, 1920); //设置手机屏幕分辨率
+
 var clickRet = click( 953, 2116 );
 log(clickRet);
 if( clickRet == true ){
@@ -68,3 +70,8 @@ if( clickRet3 == true ){
     sleep(1000);
 
 }
+
+var objectPeople = depth("18").find();
+depth("18").forEach(function( person, index ){
+    log("person: ",index);
+});
