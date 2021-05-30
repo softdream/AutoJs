@@ -36,29 +36,15 @@ myAPP.isSuspend = false;
 var nickNames = new Array();// 定义一个全局数组保存获取到的昵称
 var nicksNum = 0;
 
-//goto_find_bosses_page_first_time();
-//get_nick_name_list();
-//scroll_up();
-//refresh_page();
-//back_to_main_page();
-//click_ready_for_search();
-//serch_the_users_and_click_in("桃三岁");
-//serch_the_users_and_click_in("贱贱的剑侠");
-//travel_the_result_of_the_searched_users();
-//click_onto_first_user_found_by_searching();
-//goto_bosses_page_not_first_time();
-//click_to_chat();
-//goto_bosses_page();
-//send_test();
-//return_to_main_page_from_search_page();
-the_total_processes();
 
+the_total_processes();
 
 /* 
  * description: 用来获取发现老板页中所有boss的nick name
+ * parameter: 表示至少需要获取的昵称个数
  * return: 如果获取成功返回nick name 列表，否则返回null
  */
-function get_nick_name_list() {
+function get_nick_name_list(target_num) {
     var nick_name_list = new Array()
 
     waitForActivity("com.bx.h5.BxH5Activity");
@@ -69,36 +55,36 @@ function get_nick_name_list() {
         /* 获取发现老板界面中，所有的boss集合 */
         var object = className("android.widget.Button").find()
 
-        /* 判断是否找到boss */
-        if (!object.empty()) {
-            var previousNickName = "";
-            var count = 0;
-            for (var i = 0; i < object.length; i++) {
-                var boss_info = object.get(i)
-                //nick_name_list[i] = boss_info.parent().child(0).text()
-                //log(nick_name_list[i])
-                var presentNickName = boss_info.parent().child(0).text();
-                if( presentNickName != previousNickName ){ // 防止重复昵称
-                    log(presentNickName);
-                    nick_name_list[count] = presentNickName;
-                    count ++;
-                    previousNickName = presentNickName;
-                }
+        while (target_num > object.length) {
+            scroll_up()
+            random(1000, 2000)
+            object = null
+            object = className("android.widget.Button").find()
+        }
+
+        log("实际获得老板个数: " + object.length)
+
+        var previousNickName = "";
+        var count = 0;
+        for (var i = 0; i < object.length; i++) {
+            var boss_info = object.get(i)
+            //nick_name_list[i] = boss_info.parent().child(0).text()
+            //log(nick_name_list[i])
+            var presentNickName = boss_info.parent().child(0).text();
+            if( presentNickName != previousNickName ){ // 防止重复昵称
+                log(presentNickName);
+                nick_name_list[count] = presentNickName;
+                count ++;
+                previousNickName = presentNickName;
             }
-
-            // ------------ Added By Daofeng -------------//
-            nicksNum =  count;
-
-            return nick_name_list
         }
-        else {
-            log("not find boss")
-        }
-    }
-    else {
-        log("不在发现老板界面")
+
+        // ------------ Added By Daofeng -------------//
+        nicksNum =  count;
+        return nick_name_list
     }
 
+    log("不在发现老板界面")
     return null
 }
 
@@ -159,12 +145,13 @@ function back_to_main_page(){
             log("点击按钮失败");
             return false;
         }
+
+        /* TODO 这段代码都执行不到，上面的if else 都会return出去 */
         // 有时页面会跳出广告，需要处理掉
         if(id("ivActivityImg").exists()){
             log("出现了广告");
             back(); //点一下返回键即可
         }
-
     }
     else {
         log("没找到按钮")
@@ -253,29 +240,6 @@ function serch_the_users_and_click_in( nickName ){
 }
 
 /* 
- * description: 遍历所有搜索到的页面并依次点进去发送消息
- * parameter: None
- * return: 无
- */
-function travel_the_result_of_the_searched_users()
-{
-    waitForActivity("com.bx.android.search.SearchActivity" );
-    //if( id("nameTv").exists() ){
-        log("找到了用户列表");
-        var object = id("nameTv").find();
-        log("users number: ", object.length);
-        /*for( var i = 0; i < object.length; i ++ ){
-            var boss_info = object.get(i)
-            var nick_name = boss_info.parent().child(0).text();
-            log(nick_name);
-        }*/
-    //}
-    //else {
-      //  log("没找到用户列表");
-    //}
-}
-
-/* 
  * description: 只点进去搜索到的第一个用户，这个才是在线的
  * parameter: None
  * return: 无
@@ -313,9 +277,10 @@ function goto_find_bosses_page_first_time(){
     }
 
     // 点击我的按钮，进入“我的页面”
-    if( id("bottomLabel").className("android.widget.TextView").text("我的").exists() ){
+    var my_page = id("bottomLabel").className("android.widget.TextView").text("我的").findOne()
+    if( my_page ){
         log("找到我的按钮");
-        id("bottomLabel").className("android.widget.TextView").text("我的").findOne().parent().click()
+        my_page.parent().click()
         sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
         //等待“我的页面"加载完成
        // waitForActivity("com.android.systemui.recents.RecentsActivity");
@@ -329,11 +294,11 @@ function goto_find_bosses_page_first_time(){
             // 等待大神专属页面加载成功
 
             // 点击发现新老板
-            if( id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").exists() ){
+            var find_boss = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOne()
+            if( find_boss ){
                 log("找到点击发现新老板按钮");
-                //id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOne().click();
-                var x = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOne().bounds().centerX();
-                var y = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOne().bounds().centerY();
+                var x = find_boss.findOne().bounds().centerX();
+                var y = find_boss.findOne().bounds().centerY();
                 log("发现新老板按钮中心点: ", x, y);
                 var clickRet = click( x, y ); 
                 if( clickRet == true ){
@@ -375,19 +340,20 @@ function goto_bosses_page_not_first_time(){
     }
 
     // 点击我的按钮，进入“我的页面”
-    if( id("bottomLabel").className("android.widget.TextView").text("我的").exists() ){
+    var my_page = id("bottomLabel").className("android.widget.TextView").text("我的").findOne()
+    if( my_page ){
         log("找到我的按钮");
-        id("bottomLabel").className("android.widget.TextView").text("我的").findOne().parent().click()
+        my_page.parent().click()
         sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
         //等待“我的页面"加载完成
-       // waitForActivity("com.android.systemui.recents.RecentsActivity");
+        // waitForActivity("com.android.systemui.recents.RecentsActivity");
 
-       // 点击发现新老板
-        if( id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").exists() ){
+        // 点击发现新老板
+        var find_boss = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOne()
+        if( find_boss ){
             log("找到点击发现新老板按钮");
-            //id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOne().click();
-            var x = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOne().bounds().centerX();
-            var y = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOne().bounds().centerY();
+            var x = find_boss.findOne().bounds().centerX();
+            var y = find_boss.findOne().bounds().centerY();
             log("发现新老板按钮中心点: ", x, y);
 
             var clickRet = click( x, y ); 
@@ -427,22 +393,20 @@ function goto_bosses_page()
         // back(); //点一下返回键即可
     }
 
-    var my = id("bottomLabel").className("android.widget.TextView").text("我的").findOnce(0)
-
     // 点击我的按钮，进入“我的页面”
-    if( my != null ){
+    var my_page = id("bottomLabel").className("android.widget.TextView").text("我的").findOnce(0)
+    if( my_page != null ){
         log("找到我的按钮");
-        my.parent().click()
+        my_page.parent().click()
         sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
 
         //等待“我的页面"加载完成
-       // waitForActivity("com.android.systemui.recents.RecentsActivity");
+        // waitForActivity("com.android.systemui.recents.RecentsActivity");
 
         // 如果是大神界面，则直接点击”发现新老板“
         if( id("toolbarTitle").text("大神").exists() ){
             log("大神界面");
             // 点击发现新老板
-
             var find_boss = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOnce(0)
             if( find_boss != null ){
                 log("找到点击发现新老板按钮");
@@ -471,7 +435,7 @@ function goto_bosses_page()
         else{ // 如果是”大神专属“界面，则需要先点一下”大神专属界面“，再点击发现新老板
             // 点击大神专属按钮
             var god = id("rl_god_title").findOnce(0)
-            if( god != null ){
+            if( god ){
                 log("找到大神专属按钮");
                 god.parent().click();
                 sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
@@ -480,7 +444,7 @@ function goto_bosses_page()
 
                 // 点击发现新老板
                 var find_boss = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOnce(0)
-                if( find_boss != null ){
+                if( find_boss ){
                     log("找到点击发现新老板按钮");
 
                     var x = find_boss.bounds().centerX();
@@ -632,7 +596,8 @@ function the_total_processes(){
     scroll_up();
     random(3000, 5000)
 
-    nickNames = get_nick_name_list();
+    /* 昵称参数，可以在UI中设置一个变量，用来传输 */
+    nickNames = get_nick_name_list(10);
     log("昵称个数：", nicksNum);
 
     // 3. 获取到昵称列表之后，返回到搜索框页面
