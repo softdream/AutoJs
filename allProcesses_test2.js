@@ -1,3 +1,5 @@
+"ui";
+
 //--------------- 定义一个全局变量 -----------------//
 setScreenMetrics(1080, 1920); //设置手机屏幕分辨率
 
@@ -11,33 +13,191 @@ myAPP.appVersion = "1.0.0";//APP版本
 myAPP.taskCount = 0;
 
 // 任务总数
-myAPP.totalNum = 5000;
+myAPP.totalNum = "5000";
 
 // 每执行多少个
-myAPP.every = 10;
+myAPP.every = "10";
 
 // 暂停的秒数
-myAPP.suspend = 60;
+myAPP.suspend = "2000";
 
 // 最小延时1秒
-myAPP.delayMin = 1;
+myAPP.delayMin = "100";
 
 // 最大延时3秒
-myAPP.delayMax = 3;
+myAPP.delayMax = "2000";
 
 // 寻找节点的超时时间，单位：毫秒
-myAPP.findTimeout = 1000;
+myAPP.findTimeout = "1000";
 
 // 任务的超时时间， 单位：毫秒
-myAPP.taskTimeout = 60000;
+myAPP.taskTimeout = "60000";
+
+// 一次获取用户名的个数
+myAPP.usersNum = "100";
 
 myAPP.isSuspend = false;
 //---------------- ---------------------------// 
 var nickNames = new Array();// 定义一个全局数组保存获取到的昵称
 var nicksNum = 0;
 
+//---------------------- UI -----------------------//
 
-the_total_processes();
+ui.layout(
+    <ScrollView>
+        <vertical>
+            <appbar>
+                <toolbar id="toolbar" title="比心引流脚本" />
+            </appbar>
+
+            <card w="*" h="auto" margin="10 5" cardCornerRadius="2dp" cardElevation="1dp" gravity="center_vertical">
+                <vertical padding="18 8" h="auto">
+                    <linear>
+                        <text text="功能：引流" textColor="black" w="auto" h="40" />
+
+                    </linear>
+                </vertical>
+                <View bg="#dddddd" h="*" w="3" />
+            </card>
+
+
+            <card w="*" h="auto" margin="10 5" cardCornerRadius="2dp" cardElevation="1dp" gravity="center_vertical">
+                <vertical padding="18 8" h="auto">
+                    <linear>
+                        <text text="计划运行：" textColor="black" w="auto" />
+                        <input id="totalNum" color="black" inputType="number" w="60" />
+                        <text text="个后，停止" textColor="black" w="auto" />
+                    </linear>
+
+                    <linear>
+                        <text text="每执行：" textColor="black" w="auto" />
+                        <input id="every" color="black" inputType="number" w="60" />
+                        <text text="个，暂停" textColor="black" w="auto" />
+                        <input id="suspend" color="black" inputType="number" w="60" />
+                        <text text="毫秒" textColor="black" w="auto" />
+                    </linear>
+
+                    <linear>
+                        <text text="延时时间：" textColor="black" w="auto" />
+                        <input id="delayMin" color="black" inputType="number" w="60" />
+                        <text text="~" textColor="black" w="auto" />
+                        <input id="delayMax" color="black" inputType="number" w="60" />
+                        <text text="毫秒" textColor="black" w="auto" />
+                    </linear>
+
+                    <linear>
+                        <text text="任务超时时间：" textColor="black" w="auto" />
+                        <input id="taskTimeout" color="black" inputType="number" w="80" />
+                        <text text="毫秒" textColor="black" w="auto" />
+                    </linear>
+
+                    <linear>
+                        <text text="每次获取昵称的个数：" textColor="black" w="auto" />
+                        <input id="usersNum" color="black" inputType="number" w="80" />
+                        <text text="个" textColor="black" w="auto" />
+                    </linear>
+
+
+                </vertical>
+                <View bg="#dddddd" h="*" w="3" />
+            </card>
+            <button style="Widget.AppCompat.Button.Colored" margin="10" id="start">启动</button>
+        </vertical>
+    </ScrollView>
+);
+
+ 
+getData();   // 读取界面配置
+
+// 按钮单击事件
+ui.start.on("click", () => {
+    log("点击启动");
+    saveData();   // 保存界面配置
+    
+   // 在这里执行脚本的主要流程
+   // main_process();
+});
+
+
+// 保存界面配置
+function saveData() {
+
+    setStorageData(myAPP.characteristic, "totalNum", ui.totalNum.text())
+    setStorageData(myAPP.characteristic, "every", ui.every.text())
+    setStorageData(myAPP.characteristic, "suspend", ui.suspend.text())
+    setStorageData(myAPP.characteristic, "delayMin", ui.delayMin.text())
+    setStorageData(myAPP.characteristic, "delayMax", ui.delayMax.text())
+    setStorageData(myAPP.characteristic, "taskTimeout", ui.taskTimeout.text())
+    setStorageData(myAPP.characteristic, "usersNum", ui.usersNum.text());
+
+    log("totalNum: ", myAPP.totalNum);
+    log("every: ", myAPP.every);
+    log("suspend: ", myAPP.suspend);
+    log("delayMin: ", myAPP.delayMin);
+    log("delayMax: ", myAPP.delayMax);
+    log("taskTimeout: ", myAPP.taskTimeout);
+    log("usersNum: ", myAPP.usersNum);
+};
+
+// 读取界面配置
+function getData() {
+
+    if (getStorageData(myAPP.characteristic, "totalNum") != undefined) {
+        myAPP.totalNum = getStorageData(myAPP.characteristic, "totalNum")
+    };
+    ui.totalNum.setText(myAPP.totalNum);
+    if (getStorageData(myAPP.characteristic, "every") != undefined) {
+        myAPP.every = getStorageData(myAPP.characteristic, "every")
+    };
+    ui.every.setText(myAPP.every);
+    if (getStorageData(myAPP.characteristic, "suspend") != undefined) {
+        myAPP.suspend = getStorageData(myAPP.characteristic, "suspend")
+    };
+    ui.suspend.setText(myAPP.suspend);
+    if (getStorageData(myAPP.characteristic, "delayMin") != undefined) {
+        myAPP.delayMin = getStorageData(myAPP.characteristic, "delayMin")
+    };
+    ui.delayMin.setText(myAPP.delayMin);
+    if (getStorageData(myAPP.characteristic, "delayMax") != undefined) {
+        myAPP.delayMax = getStorageData(myAPP.characteristic, "delayMax")
+    };
+    ui.delayMax.setText(myAPP.delayMax);
+    if (getStorageData(myAPP.characteristic, "taskTimeout") != undefined) {
+        myAPP.taskTimeout = getStorageData(myAPP.characteristic, "taskTimeout")
+    };
+    ui.taskTimeout.setText(myAPP.taskTimeout);
+
+    if ( getStorageData(myAPP.characteristic, "usersNum") != undefined) {
+        myAPP.usersNum = getStorageData(myAPP.characteristic, "usersNum");
+    };
+    ui.usersNum.setText(myAPP.usersNum);
+};
+
+
+
+//保存本地数据
+function setStorageData(name, key, value) {
+    const storage = storages.create(name);  //创建storage对象
+    storage.put(key, value);
+};
+
+//读取本地数据
+function getStorageData(name, key) {
+    const storage = storages.create(name);  //创建storage对象
+    if (storage.contains(key)) {
+        return storage.get(key, "");
+    };
+    //默认返回undefined
+};
+
+//删除本地数据
+function delStorageData(name, key) {
+    const storage = storages.create(name);  //创建storage对象
+    if (storage.contains(key)) {
+        storage.remove(key);
+    };
+};
+
 
 /* 
  * description: 用来获取发现老板页中所有boss的nick name
@@ -597,7 +757,7 @@ function the_total_processes(){
     random(3000, 5000)
 
     /* 昵称参数，可以在UI中设置一个变量，用来传输 */
-    nickNames = get_nick_name_list(10);
+    nickNames = get_nick_name_list(myAPP.usersNum);
     log("昵称个数：", nicksNum);
 
     // 3. 获取到昵称列表之后，返回到搜索框页面
