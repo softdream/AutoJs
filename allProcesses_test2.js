@@ -7,10 +7,10 @@ var myAPP = {};
 
 myAPP.title = "比心引流";// 脚本名称
 myAPP.packageName = "com.yitantech.gaigai";//程序包名
-myAPP.appVersion = "1.0.0";//APP版本
+myAPP.appVersion = "7.7.5";//APP版本
 
 // 任务总数
-myAPP.totalNum = "5000";
+myAPP.totalNum = "1";
 
 // 每执行多少个
 myAPP.every = "10";
@@ -31,7 +31,7 @@ myAPP.findTimeout = "1000";
 myAPP.taskTimeout = "60000";
 
 // 一次获取用户名的个数
-myAPP.usersNum = "100";
+myAPP.usersNum = "10";
 
 myAPP.isSuspend = false;
 //---------------- ---------------------------// 
@@ -104,21 +104,14 @@ ui.layout(
 );
 
  
-getData();   // 读取界面配置
+getData(true);   // 读取界面配置
 
 // 按钮单击事件
 ui.start.on("click", () => {
     log("点击启动");
     saveData();   // 保存界面配置
+    getData(false);
     
-   // 在这里执行脚本的主要流程
-   main_process();
-});
-
-
-// 保存界面配置
-function saveData() {
-
     setStorageData(myAPP.characteristic, "totalNum", ui.totalNum.text())
     setStorageData(myAPP.characteristic, "every", ui.every.text())
     setStorageData(myAPP.characteristic, "suspend", ui.suspend.text())
@@ -126,6 +119,26 @@ function saveData() {
     setStorageData(myAPP.characteristic, "delayMax", ui.delayMax.text())
     setStorageData(myAPP.characteristic, "taskTimeout", ui.taskTimeout.text())
     setStorageData(myAPP.characteristic, "usersNum", ui.usersNum.text());
+   
+    threads.start(function(){
+        main();
+    });
+    
+});
+
+function main(){
+    // 启动比心APP
+   // Error: 不能在ui线程执行阻塞操作，请在子线程或子脚本执行，或者使用setInterval循环检测当前activity和package
+   app.launch(myAPP.packageName);
+   waitForActivity("com.bx.main.MainActivity");
+   
+  // 在这里执行脚本的主要流程
+   main_process();
+}
+
+
+// 保存界面配置
+function saveData() {
 
     log("totalNum: ", myAPP.totalNum);
     log("every: ", myAPP.every);
@@ -137,37 +150,37 @@ function saveData() {
 };
 
 // 读取界面配置
-function getData() {
+function getData( isSetValue ) {
 
     if (getStorageData(myAPP.characteristic, "totalNum") != undefined) {
         myAPP.totalNum = getStorageData(myAPP.characteristic, "totalNum")
     };
-    ui.totalNum.setText(myAPP.totalNum);
+    isSetValue && ui.totalNum.setText(myAPP.totalNum);
     if (getStorageData(myAPP.characteristic, "every") != undefined) {
         myAPP.every = getStorageData(myAPP.characteristic, "every")
     };
-    ui.every.setText(myAPP.every);
+    isSetValue && ui.every.setText(myAPP.every);
     if (getStorageData(myAPP.characteristic, "suspend") != undefined) {
         myAPP.suspend = getStorageData(myAPP.characteristic, "suspend")
     };
-    ui.suspend.setText(myAPP.suspend);
+    isSetValue && ui.suspend.setText(myAPP.suspend);
     if (getStorageData(myAPP.characteristic, "delayMin") != undefined) {
         myAPP.delayMin = getStorageData(myAPP.characteristic, "delayMin")
     };
-    ui.delayMin.setText(myAPP.delayMin);
+    isSetValue && ui.delayMin.setText(myAPP.delayMin);
     if (getStorageData(myAPP.characteristic, "delayMax") != undefined) {
         myAPP.delayMax = getStorageData(myAPP.characteristic, "delayMax")
     };
-    ui.delayMax.setText(myAPP.delayMax);
+    isSetValue && ui.delayMax.setText(myAPP.delayMax);
     if (getStorageData(myAPP.characteristic, "taskTimeout") != undefined) {
         myAPP.taskTimeout = getStorageData(myAPP.characteristic, "taskTimeout")
     };
-    ui.taskTimeout.setText(myAPP.taskTimeout);
+    isSetValue && ui.taskTimeout.setText(myAPP.taskTimeout);
 
     if ( getStorageData(myAPP.characteristic, "usersNum") != undefined) {
         myAPP.usersNum = getStorageData(myAPP.characteristic, "usersNum");
     };
-    ui.usersNum.setText(myAPP.usersNum);
+    isSetValue && ui.usersNum.setText(myAPP.usersNum);
 };
 
 
@@ -203,9 +216,9 @@ function delStorageData(name, key) {
 function get_nick_name_list(target_num) {
     var nick_name_list = new Array()
 
+    log("Get Nick Name List ...");
     waitForActivity("com.bx.h5.BxH5Activity");
 
-    log("Get Nick Name List ...");
     /* 判断当前是否处于发现老板界面 */
     if(className("android.view.View").text("发现老板").exists()){
         /* 获取发现老板界面中，所有的boss集合 */
@@ -286,30 +299,33 @@ function back_to_main_page(){
 
     waitForActivity("com.bx.main.MainActivity"); // 等待页面出现
 
-    // 有时页面会跳出广告，需要处理掉
-    /* 广告处理待定*/
-    // if(id("ivActivityImg").exists()){
-    //     log("出现了广告");
-    //     back(); //点一下返回键即可
-    // }
-
     var main_page = id("bottomLabel").className("android.widget.TextView").text("比心").findOnce(0)
-    if( main_page ){
+    if( main_page != null){ 
         log("点击回到主页面");
         
-        if( main_page.parent().click() ){
+        var clickRet = main_page.parent().click()  
+        
+        if( clickRet == true ){
             log("点击按钮成功");
+            sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
             return true;
         }
         else {
             log("点击按钮失败");
+            return false;
+        }
+
+        /* TODO 这段代码都执行不到，上面的if else 都会return出去 */
+        // 有时页面会跳出广告，需要处理掉
+        if(id("ivActivityImg").exists()){
+            log("出现了广告");
+            back(); //点一下返回键即可
         }
     }
     else {
         log("没找到按钮")
+        return false;
     }
-
-    return false;
 }
 
 /* 
@@ -323,19 +339,22 @@ function click_ready_for_search(){
     if( search != null ){
         log( "找到了搜索框" );
         
-        if( search.click() ){
+        var clickRet = search.click();// 点击进入搜索框
+        if( clickRet == true ){
             log("点击按钮成功");
+            sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
             return true;
         }
         else {
+            
             log("点击按钮失败");
+            return false;
         }
     }
     else {
         log("没找到搜索框")
+        return false;
     }
-
-    return false;
 }
 
 /* 
@@ -365,28 +384,31 @@ function serch_the_users_and_click_in( nickName ){
                 // log("搜索按钮中心点: ", x, y);
                 var clickRet = click( x, y );  
 
-                if( click( x, y ) ){
+                log( clickRet );
+                if( clickRet == true ){
                     log("点击搜索成功");
                     sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
                     return true;
                 }
                 else {
                     log("点击搜索失败");
+                    return false;
                 }
             }
             else {
                 log("没找到搜索按钮");
+                return false;
             }
         }
         else {
-            log("输入昵称失败");
+            log("未能输入昵称");
+            return false;
         }
     }
     else {
         log("没找到搜索输入框");
+        return false;
     }
-
-    return false;
 }
 
 /* 
@@ -424,6 +446,7 @@ function goto_bosses_page()
     if(id("ivActivityView").exists()){
         log("出现了广告");
         id("ivCloseDialog").click()
+        // back(); //点一下返回键即可
     }
 
     // 点击我的按钮，进入“我的页面”
@@ -431,23 +454,14 @@ function goto_bosses_page()
     if( my_page != null ){
         log("找到我的按钮");
         my_page.parent().click()
-        sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+        //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
 
         //等待“我的页面"加载完成
-        // waitForActivity("com.android.systemui.recents.RecentsActivity");
+         //waitForActivity("");
 
-        // 查看上方是否有大神专属入口
-        var god_only = id("rl_god_title").findOnce(0)
-        if( god_only ){
-            god_only.parent().click();
-            sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
-        } else {
-            log("不在User页面")     //虽然不在user页面，但是有可能已经在大神页面了
-        }
-
+        // 如果是大神界面，则直接点击”发现新老板“
         if( id("toolbarTitle").text("大神").exists() ){
-            log("进入大神界面");
-
+            log("大神界面");
             // 点击发现新老板
             var find_boss = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOnce(0)
             if( find_boss != null ){
@@ -457,21 +471,61 @@ function goto_bosses_page()
                 var y = find_boss.bounds().centerY();
                 log("发现新老板按钮中心点: ", x, y);
 
-                if( click( x, y ) ){
+                var clickRet = click( x, y ); 
+                if( clickRet == true ){
+                    //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
                     log("点击进入发现新老板界面");
-                    sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
                     return true;
                 }
                 else{
                     log("点击进入发现新老板界面失败了");
+                    return false;
                 }
+
             }
             else{
                 log("没找到点击发现新老板按钮");
+                return false;
             }
         }
-        else{
-            log("也不在大神页面");
+        else{ // 如果是”大神专属“界面，则需要先点一下”大神专属界面“，再点击发现新老板
+            // 点击大神专属按钮
+            var god = id("rl_god_title").findOnce(0)
+            if( god ){
+                log("找到大神专属按钮");
+                god.parent().click();
+                sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+
+                // 等待大神专属页面加载成功
+
+                // 点击发现新老板
+                var find_boss = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOnce(0)
+                if( find_boss ){
+                    log("找到点击发现新老板按钮");
+
+                    var x = find_boss.bounds().centerX();
+                    var y = find_boss.bounds().centerY();
+                    log("发现新老板按钮中心点: ", x, y);
+                    var clickRet = click( x, y ); 
+                    if( clickRet == true ){
+                        sleep(random( myAPP.delayMin, myAPP.delayMax )); //随机延时
+                        log("点击进入发现新老板界面");
+                        return true;
+                    }
+                    else{
+                        log("点击进入发现新老板界面失败了");
+                        return false;
+                    }
+                }
+                else{
+                    log("没找到点击发现新老板按钮");
+                    return false;
+                }
+            }
+            else {
+                log("没找到大神专属按钮");
+                return false;
+            }
         }
     }
     else {
@@ -530,17 +584,18 @@ function click_to_chat(){
  */
 function exit_to_search_page_from_chat_page(){
     back();
-
-    /* 如果回退到boss主页，两种情况（关注/未关注） */
-    if( id("chat").exists() || id("userChatFollow").exists()){
+    // 
+    if( id("follow").exists() ){
         back();
-        sleep(500)
+        sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+        back();
+        sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
 
         if( id("toolbarButtonText").className("android.widget.TextView").text("搜索").exists() ){
             return true;
         }
         else return false;
-        /* 如果没有回退到搜索页面，最好再去尝试一下 */
+
     }
     else return false;
 }
@@ -613,7 +668,7 @@ function the_total_processes(){
     }
 
     // 2. 获取用户昵称
-    sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+    //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
     scroll_up();
     random(3000, 5000)
 
@@ -626,7 +681,7 @@ function the_total_processes(){
         return false;
     }
 
-    sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+    //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
 
     // 4. 点击进入搜索框
     if( click_ready_for_search() == false){
@@ -697,14 +752,15 @@ function the_total_processes(){
  * return: ture 返回成功，false 返回出错
  */
 function main_process(){
-    var task_cnt = 0
-
-    while( task_cnt < myAPP.totalNum && myAPP.isSuspend == false ){
-        log( "当前的任务：", task_cnt );
+    var taskCount = 0;
+    while( taskCount < myAPP.totalNum && myAPP.isSuspend == false ){
+        log( "当前的任务：", taskCount );
 
         // 执行主要步骤
         the_total_processes();
-        task_cnt++;
+
+        taskCount ++;
+        
     }
 
     toastLog("任务已完成，结束脚本")
