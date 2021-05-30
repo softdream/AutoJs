@@ -10,7 +10,7 @@ myAPP.packageName = "com.yitantech.gaigai";//程序包名
 myAPP.appVersion = "7.7.5";//APP版本
 
 // 任务总数
-myAPP.totalNum = "1";
+myAPP.totalNum = "3";
 
 // 每执行多少个
 myAPP.every = "10";
@@ -31,7 +31,7 @@ myAPP.findTimeout = "1000";
 myAPP.taskTimeout = "60000";
 
 // 一次获取用户名的个数
-myAPP.usersNum = "10";
+myAPP.usersNum = "5";
 
 myAPP.isSuspend = false;
 //---------------- ---------------------------// 
@@ -140,13 +140,12 @@ function main(){
 // 保存界面配置
 function saveData() {
 
-    log("totalNum: ", myAPP.totalNum);
-    log("every: ", myAPP.every);
-    log("suspend: ", myAPP.suspend);
-    log("delayMin: ", myAPP.delayMin);
-    log("delayMax: ", myAPP.delayMax);
-    log("taskTimeout: ", myAPP.taskTimeout);
-    log("usersNum: ", myAPP.usersNum);
+    setStorageData(myAPP.characteristic, "totalNum", ui.totalNum.text())
+    setStorageData(myAPP.characteristic, "every", ui.every.text())
+    setStorageData(myAPP.characteristic, "suspend", ui.suspend.text())
+    setStorageData(myAPP.characteristic, "delayMin", ui.delayMin.text())
+    setStorageData(myAPP.characteristic, "delayMax", ui.delayMax.text())
+    setStorageData(myAPP.characteristic, "taskTimeout", ui.taskTimeout.text())
 };
 
 // 读取界面配置
@@ -208,6 +207,39 @@ function delStorageData(name, key) {
     };
 };
 
+
+
+
+/* 
+ * description: 整个步骤 
+ * parameter: None
+ * return: 如果获取成功返回nick name 列表，否则返回null
+ */
+function total_process(){
+    goto_bosses_page();
+    scroll_up();
+    random(3000, 5000)
+    nickNames = get_nick_name_list(myAPP.usersNum);
+    log("昵称个数：", nicksNum);
+    back_to_main_page();
+
+    click_ready_for_search();
+    for( var i = 0; i < nicksNum; i ++ ){
+
+        serch_the_users_and_click_in(nickNames[i]);
+        click_onto_first_user_found_by_searching();
+        click_to_chat();
+        send_test();
+        sleep(1000);
+        log("-------------准备返回搜索界面--------------");
+        exit_to_search_page_from_chat_page();
+
+        sleep(2000);
+    }
+    return_to_main_page_from_search_page();
+}
+
+
 /* 
  * description: 用来获取发现老板页中所有boss的nick name
  * parameter: 表示至少需要获取的昵称个数
@@ -226,7 +258,8 @@ function get_nick_name_list(target_num) {
 
         while (target_num > object.length) {
             scroll_up()
-            random(1000, 2000)
+            //random(1000, 2000)
+            sleep(2000);
             object = null
             object = className("android.widget.Button").find()
         }
@@ -265,7 +298,8 @@ function scroll_up() {
     //开始翻页
     // 从小往上滑动屏幕
     swipe( 640,  1930, 640, 313, 1000);// 根据坐标值来翻页
-    sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+    //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+    sleep(2000);
 }
 
 /* 
@@ -307,7 +341,7 @@ function back_to_main_page(){
         
         if( clickRet == true ){
             log("点击按钮成功");
-            sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+            //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
             return true;
         }
         else {
@@ -342,7 +376,7 @@ function click_ready_for_search(){
         var clickRet = search.click();// 点击进入搜索框
         if( clickRet == true ){
             log("点击按钮成功");
-            sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+            //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
             return true;
         }
         else {
@@ -387,7 +421,7 @@ function serch_the_users_and_click_in( nickName ){
                 log( clickRet );
                 if( clickRet == true ){
                     log("点击搜索成功");
-                    sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+                    //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
                     return true;
                 }
                 else {
@@ -421,17 +455,21 @@ function click_onto_first_user_found_by_searching(){
         var target = child.findOne(id("nameTv"));
         target.parent().click();
         });*/
+    if( id("title").text("相关用户").exists ){
 
+        log("找到了第一个用户");
+        var clickRet = id("subList").findOne().children().findOne( id("nameTv") ).parent().click();
 
-    log("找到了第一个用户");
-    var clickRet = id("subList").findOne().children().findOne( id("nameTv") ).parent().click();
-
-    if( clickRet == true ) {
-        sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
-        return true;
-    }
-    else 
+        if( clickRet == true ) {
+        // sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+            return true;
+        }
+        else 
+            return false;
+    }      
+    else {
         return false;
+    }
 }
 
 
@@ -543,7 +581,7 @@ function goto_bosses_page()
 function click_to_chat(){
     // 等待页面加载成功
     waitForActivity("com.bx.user.controler.userdetail.activity.UserDetailV2Activity");
-    sleep(500);
+    sleep(1000);
 
     // 点击聊一聊
     var chat_bt
@@ -558,13 +596,13 @@ function click_to_chat(){
 
         if( chat_bt.click() ){
             log("点击聊一聊按钮成功");
-            sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+            //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
             return true;
         }
         else {
             log("点击聊一聊按钮失败, click again");
-             if (chat_bt.click()) {
-                sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+            if (chat_bt.click()) {
+                //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
                 log("点击聊一聊按钮成功");
                 return true;
              }
@@ -583,21 +621,30 @@ function click_to_chat(){
  * return: ture 返回成功，false 返回出错
  */
 function exit_to_search_page_from_chat_page(){
+    waitForActivity("com.bx.im.P2PMessageActivity");
     back();
     // 
     if( id("follow").exists() ){
+    //if(id("itemMoreInfos").exists()){
+        log("返回到了个人主页页面");
         back();
-        sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
-        back();
-        sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
-
+        //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+        sleep(1000);
+        //back();
+        //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+        //sleep(1000);
         if( id("toolbarButtonText").className("android.widget.TextView").text("搜索").exists() ){
+            log("回到了搜索页面");
             return true;
         }
-        else return false;
-
+        else {
+            log("没回到搜索页面");
+            return false;
+        }
     }
-    else return false;
+    else{
+         return false;
+    }
 }
 
 /* 
@@ -611,9 +658,9 @@ function return_to_main_page_from_search_page(){
         //如果在搜索页面，则执行back     
         log("在搜索页面"); 
         back();
-        sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+        //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
         // 返回之后判断一下在不在主页面
-        if(id("bottomLabel").className("android.widget.TextView").text("回到顶部").exists()){
+        if(id("bottomLabel").className("android.widget.TextView").text("比心").exists()){
             //如果在主页面，返回成功
             log("返回到主页面了");
             return true;
@@ -687,33 +734,34 @@ function the_total_processes(){
     if( click_ready_for_search() == false){
         return false;
     }
-    sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+    //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
 
     // 5. 遍历昵称列表，对每个昵称执行以下操作
     for( var i = 0; i < nicksNum; i ++ ){
         // 6. 搜索用户
         if(serch_the_users_and_click_in( nickNames[i] )){
-            sleep(random( myAPP.delayMin, myAPP.delayMax )); //随机延时
+            //sleep(random( myAPP.delayMin, myAPP.delayMax )); //随机延时
 
             // 7. 点进去用户
             if( click_onto_first_user_found_by_searching() ){
-                sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+                //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
 
                  // 8. 点击聊一聊
                 if( click_to_chat() == false){
                     return false;
                 }
-                sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+                //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
 
                 // 9. 发送一个测试文本
                 send_test();
-                sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+                //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
 
                 // 10. 回到搜索页面
                 if( exit_to_search_page_from_chat_page() == false ){
                     return false;
                 }
-                sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+                //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+                sleep(1000);
             }
             else {
                 return false;
@@ -757,9 +805,11 @@ function main_process(){
         log( "当前的任务：", taskCount );
 
         // 执行主要步骤
-        the_total_processes();
+        total_process();
 
         taskCount ++;
+
+        sleep(5000);
         
     }
 
