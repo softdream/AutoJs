@@ -198,7 +198,6 @@ function delStorageData(name, key) {
     };
 };
 
-
 /* 
  * description: 用来获取发现老板页中所有boss的nick name
  * parameter: 表示至少需要获取的昵称个数
@@ -256,7 +255,7 @@ function scroll_up() {
     //开始翻页
     // 从小往上滑动屏幕
     swipe( 640,  1930, 640, 313, 1000);// 根据坐标值来翻页
-    sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+    sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
 }
 
 /* 
@@ -267,7 +266,7 @@ function scroll_down() {
     //开始翻页
     // 从小往上滑动屏幕
     swipe(  640, 1000, 640,  1930, 1000);// 根据坐标值来翻页
-    sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+    sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
 }
 
 /* 
@@ -278,7 +277,7 @@ function refresh_page()
 {
     // 一种方法是使用swipe函数
     swipe( 640, 635, 640, 1060, 1000 );    
-    sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+    sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
 }
 
 /* 
@@ -298,7 +297,7 @@ function back_to_main_page(){
         
         if( clickRet == true ){
             log("点击按钮成功");
-            sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+            sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
             return true;
         }
         else {
@@ -325,14 +324,15 @@ function back_to_main_page(){
  */
 function click_ready_for_search(){
 
-    var search = id("searchView").findOnce(0)
+    //var search = id("searchView").findOnce(0);
+    var search = id("timeline_text_search").findOne();
     if( search != null ){
         log( "找到了搜索框" );
         
         var clickRet = search.click();// 点击进入搜索框
         if( clickRet == true ){
             log("点击按钮成功");
-            sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+            sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
             return true;
         }
         else {
@@ -375,7 +375,7 @@ function serch_the_users_and_click_in( nickName ){
                 log( clickRet );
                 if( clickRet == true ){
                     log("点击搜索成功");
-                    sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+                    sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
                     return true;
                 }
                 else {
@@ -415,7 +415,7 @@ function click_onto_first_user_found_by_searching(){
     var clickRet = id("subList").findOne().children().findOne( id("nameTv") ).parent().click();
 
     if( clickRet == true ) {
-        sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+        sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
         return true;
     }
     else 
@@ -442,7 +442,7 @@ function goto_bosses_page()
     if( my_page != null ){
         log("找到我的按钮");
         my_page.parent().click()
-        sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+        sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
 
         //等待“我的页面"加载完成
         // waitForActivity("com.android.systemui.recents.RecentsActivity");
@@ -461,7 +461,7 @@ function goto_bosses_page()
 
                 var clickRet = click( x, y ); 
                 if( clickRet == true ){
-                    sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+                    sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
                     log("点击进入发现新老板界面");
                     return true;
                 }
@@ -482,7 +482,7 @@ function goto_bosses_page()
             if( god ){
                 log("找到大神专属按钮");
                 god.parent().click();
-                sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+                sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
 
                 // 等待大神专属页面加载成功
 
@@ -496,7 +496,7 @@ function goto_bosses_page()
                     log("发现新老板按钮中心点: ", x, y);
                     var clickRet = click( x, y ); 
                     if( clickRet == true ){
-                        sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+                        sleep(random( myAPP.delayMin, myAPP.delayMax )); //随机延时
                         log("点击进入发现新老板界面");
                         return true;
                     }
@@ -546,13 +546,13 @@ function click_to_chat(){
 
         if( chat_bt.click() ){
             log("点击聊一聊按钮成功");
-            sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+            sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
             return true;
         }
         else {
             log("点击聊一聊按钮失败, click again");
              if (chat_bt.click()) {
-                sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+                sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
                 log("点击聊一聊按钮成功");
                 return true;
              }
@@ -575,9 +575,9 @@ function exit_to_search_page_from_chat_page(){
     // 
     if( id("follow").exists() ){
         back();
-        sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+        sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
         back();
-        sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+        sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
 
         if( id("toolbarButtonText").className("android.widget.TextView").text("搜索").exists() ){
             return true;
@@ -599,7 +599,7 @@ function return_to_main_page_from_search_page(){
         //如果在搜索页面，则执行back     
         log("在搜索页面"); 
         back();
-        sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+        sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
         // 返回之后判断一下在不在主页面
         if(id("bottomLabel").className("android.widget.TextView").text("回到顶部").exists()){
             //如果在主页面，返回成功
@@ -656,7 +656,7 @@ function the_total_processes(){
     }
 
     // 2. 获取用户昵称
-    sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+    sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
     scroll_up();
     random(3000, 5000)
 
@@ -669,39 +669,39 @@ function the_total_processes(){
         return false;
     }
 
-    sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+    sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
 
     // 4. 点击进入搜索框
     if( click_ready_for_search() == false){
         return false;
     }
-    sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+    sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
 
     // 5. 遍历昵称列表，对每个昵称执行以下操作
     for( var i = 0; i < nicksNum; i ++ ){
         // 6. 搜索用户
         if(serch_the_users_and_click_in( nickNames[i] )){
-            sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+            sleep(random( myAPP.delayMin, myAPP.delayMax )); //随机延时
 
             // 7. 点进去用户
             if( click_onto_first_user_found_by_searching() ){
-                sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+                sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
 
                  // 8. 点击聊一聊
                 if( click_to_chat() == false){
                     return false;
                 }
-                sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+                sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
 
                 // 9. 发送一个测试文本
                 send_test();
-                sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+                sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
 
                 // 10. 回到搜索页面
                 if( exit_to_search_page_from_chat_page() == false ){
                     return false;
                 }
-                sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
+                sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
             }
             else {
                 return false;
