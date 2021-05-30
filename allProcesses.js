@@ -95,31 +95,30 @@ function back_to_main_page(){
 
     waitForActivity("com.bx.main.MainActivity"); // 等待页面出现
 
+    // 有时页面会跳出广告，需要处理掉
+    /* 广告处理待定*/
+    // if(id("ivActivityImg").exists()){
+    //     log("出现了广告");
+    //     back(); //点一下返回键即可
+    // }
+
     var main_page = id("bottomLabel").className("android.widget.TextView").text("比心").findOnce(0)
-    if( main_page != null){ 
+    if( main_page ){
         log("点击回到主页面");
         
-        var clickRet = main_page.parent().click()  
-        
-        if( clickRet == true ){
+        if( main_page.parent().click() ){
             log("点击按钮成功");
             return true;
         }
         else {
             log("点击按钮失败");
-            return false;
-        }
-        /* TODO 这段代码都执行不到，上面的if else 都会return出去 */
-        // 有时页面会跳出广告，需要处理掉
-        if(id("ivActivityImg").exists()){
-            log("出现了广告");
-            back(); //点一下返回键即可
         }
     }
     else {
         log("没找到按钮")
-        return false;
     }
+
+    return false;
 }
 
 /* 
@@ -131,22 +130,20 @@ function click_ready_for_search(){
     var search = id("searchView").findOnce(0)
     if( search != null ){
         log( "找到了搜索框" );
-        
-        var clickRet = search.click();// 点击进入搜索框
-        if( clickRet == true ){
+
+        if( search.click() ){
             log("点击按钮成功");
             return true;
         }
         else {
-            
             log("点击按钮失败");
-            return false;
         }
     }
     else {
         log("没找到搜索框")
-        return false;
     }
+
+    return false;
 }
 
 /* 
@@ -172,32 +169,28 @@ function serch_the_users_and_click_in( nickName ){
                 var x = search_bt.bounds().centerX();
                 var y = search_bt.bounds().centerY();
                 // log("搜索按钮中心点: ", x, y);
-                var clickRet = click( x, y );  
 
-                log( clickRet );
-                if( clickRet == true ){
+                if( click( x, y ) ){
                     log("点击搜索成功");
                     return true;
                 }
                 else {
                     log("点击搜索失败");
-                    return false;
                 }
             }
             else {
                 log("没找到搜索按钮");
-                return false;
             }
         }
         else {
             log("输入昵称失败");
-            return false;
         }
     }
     else {
         log("没找到搜索输入框");
-        return false;
     }
+
+    return false;
 }
 
 /* 
@@ -229,11 +222,6 @@ function travel_the_result_of_the_searched_users()
  * return: 无
  */
 function click_onto_first_user_found_by_searching(){
-   /* id("subList").findOne().children().forEach(child => {
-        var target = child.findOne(id("nameTv"));
-        target.parent().click();
-        });*/
-
 
     log("找到了第一个用户");
     // var clickRet = id("subList").findOne().children().findOne( id("nameTv") ).parent().click();
@@ -247,119 +235,6 @@ function click_onto_first_user_found_by_searching(){
 }
 
 /* 
- * description: 打开app后第一次进入发现新老板的步骤：点击”我的“按钮-->点击”大神专属“-->点击"发现新老板"
- * parameter: None
- * return: true 执行成功
- */
-function goto_find_bosses_page_first_time(){
-    //------------------ 首次打开程序后执行这个函数 ---------------------//
-
-    // 有时页面会跳出广告，需要处理掉
-    if(id("ivActivityImg").exists()){
-        log("出现了广告");
-        back(); //点一下返回键即可
-    }
-
-    // 点击我的按钮，进入“我的页面”
-    var my_page = id("bottomLabel").className("android.widget.TextView").text("我的").findOne()
-    if( my_page ){
-        log("找到我的按钮");
-        my_page.parent().click()
-
-        //等待“我的页面"加载完成
-       // waitForActivity("com.android.systemui.recents.RecentsActivity");
-
-        // 点击大神专属按钮
-        if( id("rl_god_title").exists() ){
-            log("找到大神专属按钮");
-            id("rl_god_title").findOne().parent().click();
-
-            // 等待大神专属页面加载成功
-
-            // 点击发现新老板
-            var find_boss = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOne()
-            if( find_boss != null ){
-                log("找到点击发现新老板按钮");
-                var x = find_boss.findOne().bounds().centerX();
-                var y = find_boss.findOne().bounds().centerY();
-                log("发现新老板按钮中心点: ", x, y);
-                var clickRet = click( x, y ); 
-                if( clickRet == true ){
-                    log("点击进入发现新老板界面");
-                    return true;
-                }
-                else{
-                    log("点击进入发现新老板界面失败了");
-                    return false;
-                }
-            }
-            else{
-                log("没找到点击发现新老板按钮");
-                return false;
-            }
-        }
-        else {
-            log("没找到大神专属按钮");
-            return false;
-        }
-    }
-    else {
-        log("没找到我的按钮");
-        return false;
-    }
-}
-
-/* 
- * description: 除了第一次之后进入”发现新老板“页面的步骤：点击”我的“按钮--> 点击”发现新老板“按钮
- * parameter: None
- * return: true 执行成功
- */
-function goto_bosses_page_not_first_time(){
-// 有时页面会跳出广告，需要处理掉
-    if(id("ivActivityImg").exists()){
-        log("出现了广告");
-        back(); //点一下返回键即可
-    }
-
-    // 点击我的按钮，进入“我的页面”
-    if( id("bottomLabel").className("android.widget.TextView").text("我的").exists() ){
-        log("找到我的按钮");
-        id("bottomLabel").className("android.widget.TextView").text("我的").findOne().parent().click()
-
-        //等待“我的页面"加载完成
-       // waitForActivity("com.android.systemui.recents.RecentsActivity");
-
-       // 点击发现新老板
-       var find_boss = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOne()
-        if( find_boss != null ){
-            log("找到点击发现新老板按钮");
-            var x = find_boss.findOne().bounds().centerX();
-            var y = find_boss.findOne().bounds().centerY();
-            log("发现新老板按钮中心点: ", x, y);
-
-            var clickRet = click( x, y ); 
-            if( clickRet == true ){
-                log("点击进入发现新老板界面");
-                return true;
-            }
-            else{
-                log("点击进入发现新老板界面失败了");
-                return false;
-            }
-
-        }
-        else{
-            log("没找到点击发现新老板按钮");
-            return false;
-        }
-    }
-    else{
-        log("没找到我的按钮");
-        return false;
-    }
-}
-
-/* 
  * description: 进入”发现新老板“，自动判断是否需要点击”大神专属“按钮
  * parameter: None
  * return: true 执行成功
@@ -370,20 +245,27 @@ function goto_bosses_page()
     if(id("ivActivityView").exists()){
         log("出现了广告");
         id("ivCloseDialog").click()
-        // back(); //点一下返回键即可
     }
 
-    var my = id("bottomLabel").className("android.widget.TextView").text("我的").findOnce(0)
-
     // 点击我的按钮，进入“我的页面”
-    if( my != null ){
+    var my_page = id("bottomLabel").className("android.widget.TextView").text("我的").findOnce(0)
+    if( my_page ){
         log("找到我的按钮");
-        my.parent().click()
+        my_page.parent().click()
+        sleep(1000)
 
         //等待“我的页面"加载完成
-       // waitForActivity("com.android.systemui.recents.RecentsActivity");
+        // waitForActivity("com.android.systemui.recents.RecentsActivity");
 
-        // 如果是大神界面，则直接点击”发现新老板“
+        // 查看上方是否有大神专属入口
+        var god_only = id("rl_god_title").findOnce(0)
+        if( god_only ){
+            god_only.parent().click();
+            sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+        } else {
+            log("不在User页面")     //虽然不在user页面，但是有可能已经在大神页面了
+        }
+
         if( id("toolbarTitle").text("大神").exists() ){
             log("大神界面");
             // 点击发现新老板
@@ -396,66 +278,30 @@ function goto_bosses_page()
                 var y = find_boss.bounds().centerY();
                 log("发现新老板按钮中心点: ", x, y);
 
-                var clickRet = click( x, y ); 
-                if( clickRet == true ){
+                // var clickRet = click( x, y ); 
+                if( click( x, y ) ){
                     log("点击进入发现新老板界面");
+                    sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
                     return true;
                 }
                 else{
                     log("点击进入发现新老板界面失败了");
-                    return false;
                 }
-
             }
             else{
                 log("没找到点击发现新老板按钮");
-                return false;
             }
         }
-        else{ // 如果是”大神专属“界面，则需要先点一下”大神专属界面“，再点击发现新老板
-            // 点击大神专属按钮
-            var god = id("rl_god_title").findOnce(0)
-            if( god != null ){
-                log("找到大神专属按钮");
-                god.parent().click();
-
-                // 等待大神专属页面加载成功
-
-                // 点击发现新老板
-                var find_boss = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOnce(0)
-                if( find_boss != null ){
-                    log("找到点击发现新老板按钮");
-
-                    var x = find_boss.bounds().centerX();
-                    var y = find_boss.bounds().centerY();
-                    log("发现新老板按钮中心点: ", x, y);
-                    var clickRet = click( x, y ); 
-                    if( clickRet == true ){
-                        log("点击进入发现新老板界面");
-                        return true;
-                    }
-                    else{
-                        log("点击进入发现新老板界面失败了");
-                        return false;
-                    }
-                }
-                else{
-                    log("没找到点击发现新老板按钮");
-                    return false;
-                }
-            }
-            else {
-                log("没找到大神专属按钮");
-                return false;
-            }
+        else{
+            log("也不在大神页面");
         }
     }
     else {
-        log("没找到我的按钮");
-        return false;
+        log("没找到 我的 按钮");
     }
-}
 
+    return false;
+}
 
 /* 
  * description: 点击”聊一聊“
@@ -484,10 +330,10 @@ function click_to_chat(){
         }
         else {
             log("点击聊一聊按钮失败, click again");
-             if (chat_bt.click()) {
+            if (chat_bt.click()) {
                 log("点击聊一聊按钮成功");
                 return true;
-             }
+            }
             return false;
         }
     }
@@ -504,17 +350,17 @@ function click_to_chat(){
  */
 function exit_to_search_page_from_chat_page(){
     back();
-    // 
-    if( id("follow").exists() ){
+
+    /* 如果回退到boss主页，两种情况（关注/未关注） */
+    if( id("chat").exists() || id("userChatFollow").exists()){
         back();
-        sleep(100)
-        back()
+        sleep(500)
 
         if( id("toolbarButtonText").className("android.widget.TextView").text("搜索").exists() ){
             return true;
         }
         else return false;
-
+        /* 如果没有回退到搜索页面，最好再去尝试一下 */
     }
     else return false;
 }
@@ -540,11 +386,11 @@ function Main_Process(){
     }
 
     // 2. 获取用户昵称
-    sleep(1000);
+    sleep(1500);
     scroll_up();
-    random(3000, 5000)
+    sleep(random(1000, 5000))
 
-    nickNames = get_nick_name_list(10);
+    nickNames = get_nick_name_list(5);
     log("昵称个数：", nicksNum);
 
     // 3. 获取到昵称列表之后，返回到搜索框页面
@@ -555,7 +401,9 @@ function Main_Process(){
     sleep(1000)
 
     // 4. 点击进入搜索框
-    click_ready_for_search();
+    if (click_ready_for_search() == false) {
+        return
+    }
     sleep(1000);
 
     // 5. 遍历昵称列表，对每个昵称执行以下操作
