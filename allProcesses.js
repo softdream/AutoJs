@@ -3,28 +3,14 @@ setScreenMetrics(1080, 1920); //设置手机屏幕分辨率
 var nickNames = new Array();// 定义一个全局数组保存获取到的昵称
 var nicksNum = 0;
 
-//goto_find_bosses_page_first_time();
-//get_nick_name_list();
-//scroll_up();
-//refresh_page();
-//back_to_main_page();
-//click_ready_for_search();
-//serch_the_users_and_click_in("桃三岁");
-//serch_the_users_and_click_in("贱贱的剑侠");
-//travel_the_result_of_the_searched_users();
-//click_onto_first_user_found_by_searching();
-//goto_bosses_page_not_first_time();
-//click_to_chat();
-//goto_bosses_page();
-//send_test();
-the_total_processes();
-
+Main_Process();
 
 /* 
  * description: 用来获取发现老板页中所有boss的nick name
+ * parameter: 表示至少需要获取的昵称个数
  * return: 如果获取成功返回nick name 列表，否则返回null
  */
-function get_nick_name_list() {
+function get_nick_name_list(target_num) {
     var nick_name_list = new Array()
 
     waitForActivity("com.bx.h5.BxH5Activity");
@@ -35,36 +21,36 @@ function get_nick_name_list() {
         /* 获取发现老板界面中，所有的boss集合 */
         var object = className("android.widget.Button").find()
 
-        /* 判断是否找到boss */
-        if (!object.empty()) {
-            var previousNickName = "";
-            var count = 0;
-            for (var i = 0; i < object.length; i++) {
-                var boss_info = object.get(i)
-                //nick_name_list[i] = boss_info.parent().child(0).text()
-                //log(nick_name_list[i])
-                var presentNickName = boss_info.parent().child(0).text();
-                if( presentNickName != previousNickName ){ // 防止重复昵称
-                    log(presentNickName);
-                    nick_name_list[count] = presentNickName;
-                    count ++;
-                    previousNickName = presentNickName;
-                }
+        while (target_num > object.length) {
+            scroll_up()
+            random(1000, 2000)
+            object = null
+            object = className("android.widget.Button").find()
+        }
+
+        log("实际获得老板个数: " + object.length)
+
+        var previousNickName = "";
+        var count = 0;
+        for (var i = 0; i < object.length; i++) {
+            var boss_info = object.get(i)
+            //nick_name_list[i] = boss_info.parent().child(0).text()
+            //log(nick_name_list[i])
+            var presentNickName = boss_info.parent().child(0).text();
+            if( presentNickName != previousNickName ){ // 防止重复昵称
+                log(presentNickName);
+                nick_name_list[count] = presentNickName;
+                count ++;
+                previousNickName = presentNickName;
             }
-
-            // ------------ Added By Daofeng -------------//
-            nicksNum =  count;
-
-            return nick_name_list
         }
-        else {
-            log("not find boss")
-        }
-    }
-    else {
-        log("不在发现老板界面")
+
+        // ------------ Added By Daofeng -------------//
+        nicksNum =  count;
+        return nick_name_list
     }
 
+    log("不在发现老板界面")
     return null
 }
 
@@ -544,7 +530,7 @@ function send_test(){
  * parameter: None
  * return: ture 返回成功，false 返回出错
  */
-function the_total_processes(){
+function Main_Process(){
     // 1. 进入发现新老板页面
     if( goto_bosses_page() == false ){
         return ;
@@ -555,7 +541,7 @@ function the_total_processes(){
     scroll_up();
     random(3000, 5000)
 
-    nickNames = get_nick_name_list();
+    nickNames = get_nick_name_list(10);
     log("昵称个数：", nicksNum);
 
     // 3. 获取到昵称列表之后，返回到搜索框页面
