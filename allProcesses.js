@@ -261,7 +261,7 @@ function goto_bosses_page()
         var god_only = id("rl_god_title").findOnce(0)
         if( god_only ){
             god_only.parent().click();
-            sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+            sleep(random( 1000, 2000 ) ); //随机延时
         } else {
             log("不在User页面")     //虽然不在user页面，但是有可能已经在大神页面了
         }
@@ -281,7 +281,7 @@ function goto_bosses_page()
                 // var clickRet = click( x, y ); 
                 if( click( x, y ) ){
                     log("点击进入发现新老板界面");
-                    sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+                    sleep(random( 1000, 2000 ) ); //随机延时
                     return true;
                 }
                 else{
