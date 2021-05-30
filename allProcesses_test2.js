@@ -50,6 +50,15 @@ ui.layout(
             <card w="*" h="auto" margin="10 5" cardCornerRadius="2dp" cardElevation="1dp" gravity="center_vertical">
                 <vertical padding="18 8" h="auto">
                     <linear>
+                        <Switch id="autoService" text="无障碍服务:" checked="{{auto.service != null}}" w="auto" textStyle="bold" />
+                    </linear>
+                </vertical>
+                <View bg="#E51400" h="*" w="5" />
+            </card>
+
+            <card w="*" h="auto" margin="10 5" cardCornerRadius="2dp" cardElevation="1dp" gravity="center_vertical">
+                <vertical padding="18 8" h="auto">
+                    <linear>
                         <text text="功能：引流" textColor="black" w="auto" h="40" />
 
                     </linear>
@@ -106,11 +115,36 @@ ui.layout(
  
 getData(true);   // 读取界面配置
 
+//开关的单击事件
+ui.autoService.on("check", function (checked) {
+    // 用户勾选无障碍服务的选项时，跳转到页面让用户去开启
+    if (checked && auto.service == null) {
+        app.startActivity({
+            action: "android.settings.ACCESSIBILITY_SETTINGS"
+        });
+    }
+    if (!checked && auto.service != null) {
+        auto.service.disableSelf();
+    }
+});
+
+// 当用户回到本界面时，resume事件会被触发
+ui.emitter.on("resume", function () {
+    // 此时根据无障碍服务的开启情况，同步开关的状态
+    ui.autoService.checked = auto.service != null;
+});
+
 // 按钮单击事件
 ui.start.on("click", () => {
     log("点击启动");
     saveData();   // 保存界面配置
     getData(false);
+
+    //程序开始运行之前判断无障碍服务
+    if (auto.service == null) {
+        toastLog("请先开启无障碍服务！");
+        return;  //返回。不再往下执行
+    };
     
     setStorageData(myAPP.characteristic, "totalNum", ui.totalNum.text())
     setStorageData(myAPP.characteristic, "every", ui.every.text())
@@ -119,6 +153,17 @@ ui.start.on("click", () => {
     setStorageData(myAPP.characteristic, "delayMax", ui.delayMax.text())
     setStorageData(myAPP.characteristic, "taskTimeout", ui.taskTimeout.text())
     setStorageData(myAPP.characteristic, "usersNum", ui.usersNum.text());
+
+     // 屏蔽音量键调节声音
+     /*events.setKeyInterceptionEnabled("volume_up", true);
+     //启用按键监听
+     events.observeKey();
+     //监听音量键按下
+     events.onKeyDown("volume_up", () => {
+         toastLog('按音量键停止');
+         exit();   //停止、退出脚本
+     });*/
+ 
    
     threads.start(function(){
         main();
@@ -365,6 +410,7 @@ function back_to_main_page(){
 function click_ready_for_search(){
 
     var search = id("searchView").findOnce(0);
+    
     if( search != null ){
         log( "找到了搜索框" );
         
