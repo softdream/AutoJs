@@ -7,13 +7,10 @@ var myAPP = {};
 
 myAPP.title = "比心引流";// 脚本名称
 myAPP.packageName = "com.yitantech.gaigai";//程序包名
-myAPP.appVersion = "1.0.0";//APP版本
-
-// 任务计数
-myAPP.taskCount = 0;
+myAPP.appVersion = "7.7.5";//APP版本
 
 // 任务总数
-myAPP.totalNum = "5000";
+myAPP.totalNum = "1";
 
 // 每执行多少个
 myAPP.every = "10";
@@ -34,7 +31,7 @@ myAPP.findTimeout = "1000";
 myAPP.taskTimeout = "60000";
 
 // 一次获取用户名的个数
-myAPP.usersNum = "100";
+myAPP.usersNum = "10";
 
 myAPP.isSuspend = false;
 //---------------- ---------------------------// 
@@ -107,21 +104,14 @@ ui.layout(
 );
 
  
-getData();   // 读取界面配置
+getData(true);   // 读取界面配置
 
 // 按钮单击事件
 ui.start.on("click", () => {
     log("点击启动");
     saveData();   // 保存界面配置
+    getData(false);
     
-   // 在这里执行脚本的主要流程
-   // main_process();
-});
-
-
-// 保存界面配置
-function saveData() {
-
     setStorageData(myAPP.characteristic, "totalNum", ui.totalNum.text())
     setStorageData(myAPP.characteristic, "every", ui.every.text())
     setStorageData(myAPP.characteristic, "suspend", ui.suspend.text())
@@ -129,6 +119,26 @@ function saveData() {
     setStorageData(myAPP.characteristic, "delayMax", ui.delayMax.text())
     setStorageData(myAPP.characteristic, "taskTimeout", ui.taskTimeout.text())
     setStorageData(myAPP.characteristic, "usersNum", ui.usersNum.text());
+   
+    threads.start(function(){
+        main();
+    });
+    
+});
+
+function main(){
+    // 启动比心APP
+   // Error: 不能在ui线程执行阻塞操作，请在子线程或子脚本执行，或者使用setInterval循环检测当前activity和package
+   app.launch(myAPP.packageName);
+   waitForActivity("com.bx.main.MainActivity");
+   
+  // 在这里执行脚本的主要流程
+   main_process();
+}
+
+
+// 保存界面配置
+function saveData() {
 
     log("totalNum: ", myAPP.totalNum);
     log("every: ", myAPP.every);
@@ -140,37 +150,37 @@ function saveData() {
 };
 
 // 读取界面配置
-function getData() {
+function getData( isSetValue ) {
 
     if (getStorageData(myAPP.characteristic, "totalNum") != undefined) {
         myAPP.totalNum = getStorageData(myAPP.characteristic, "totalNum")
     };
-    ui.totalNum.setText(myAPP.totalNum);
+    isSetValue && ui.totalNum.setText(myAPP.totalNum);
     if (getStorageData(myAPP.characteristic, "every") != undefined) {
         myAPP.every = getStorageData(myAPP.characteristic, "every")
     };
-    ui.every.setText(myAPP.every);
+    isSetValue && ui.every.setText(myAPP.every);
     if (getStorageData(myAPP.characteristic, "suspend") != undefined) {
         myAPP.suspend = getStorageData(myAPP.characteristic, "suspend")
     };
-    ui.suspend.setText(myAPP.suspend);
+    isSetValue && ui.suspend.setText(myAPP.suspend);
     if (getStorageData(myAPP.characteristic, "delayMin") != undefined) {
         myAPP.delayMin = getStorageData(myAPP.characteristic, "delayMin")
     };
-    ui.delayMin.setText(myAPP.delayMin);
+    isSetValue && ui.delayMin.setText(myAPP.delayMin);
     if (getStorageData(myAPP.characteristic, "delayMax") != undefined) {
         myAPP.delayMax = getStorageData(myAPP.characteristic, "delayMax")
     };
-    ui.delayMax.setText(myAPP.delayMax);
+    isSetValue && ui.delayMax.setText(myAPP.delayMax);
     if (getStorageData(myAPP.characteristic, "taskTimeout") != undefined) {
         myAPP.taskTimeout = getStorageData(myAPP.characteristic, "taskTimeout")
     };
-    ui.taskTimeout.setText(myAPP.taskTimeout);
+    isSetValue && ui.taskTimeout.setText(myAPP.taskTimeout);
 
     if ( getStorageData(myAPP.characteristic, "usersNum") != undefined) {
         myAPP.usersNum = getStorageData(myAPP.characteristic, "usersNum");
     };
-    ui.usersNum.setText(myAPP.usersNum);
+    isSetValue && ui.usersNum.setText(myAPP.usersNum);
 };
 
 
@@ -206,9 +216,9 @@ function delStorageData(name, key) {
 function get_nick_name_list(target_num) {
     var nick_name_list = new Array()
 
+    log("Get Nick Name List ...");
     waitForActivity("com.bx.h5.BxH5Activity");
 
-    log("Get Nick Name List ...");
     /* 判断当前是否处于发现老板界面 */
     if(className("android.view.View").text("发现老板").exists()){
         /* 获取发现老板界面中，所有的boss集合 */
@@ -444,10 +454,10 @@ function goto_bosses_page()
     if( my_page != null ){
         log("找到我的按钮");
         my_page.parent().click()
-        sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+        //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
 
         //等待“我的页面"加载完成
-        // waitForActivity("com.android.systemui.recents.RecentsActivity");
+         //waitForActivity("");
 
         // 如果是大神界面，则直接点击”发现新老板“
         if( id("toolbarTitle").text("大神").exists() ){
@@ -463,7 +473,7 @@ function goto_bosses_page()
 
                 var clickRet = click( x, y ); 
                 if( clickRet == true ){
-                    sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+                    //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
                     log("点击进入发现新老板界面");
                     return true;
                 }
@@ -658,7 +668,7 @@ function the_total_processes(){
     }
 
     // 2. 获取用户昵称
-    sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+    //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
     scroll_up();
     random(3000, 5000)
 
@@ -671,7 +681,7 @@ function the_total_processes(){
         return false;
     }
 
-    sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
+    //sleep(random( myAPP.delayMin, myAPP.delayMax ) ); //随机延时
 
     // 4. 点击进入搜索框
     if( click_ready_for_search() == false){
@@ -742,7 +752,8 @@ function the_total_processes(){
  * return: ture 返回成功，false 返回出错
  */
 function main_process(){
-    while( myAPP.taskCount < myAPP.totalNum && myAPP.isSuspend == false ){
+    var taskCount = 0;
+    while( taskCount < myAPP.totalNum && myAPP.isSuspend == false ){
         log( "当前的任务：", taskCount );
 
         // 执行主要步骤
