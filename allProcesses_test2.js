@@ -9,9 +9,6 @@ myAPP.title = "比心引流";// 脚本名称
 myAPP.packageName = "com.yitantech.gaigai";//程序包名
 myAPP.appVersion = "1.0.0";//APP版本
 
-// 任务计数
-myAPP.taskCount = 0;
-
 // 任务总数
 myAPP.totalNum = "5000";
 
@@ -115,7 +112,7 @@ ui.start.on("click", () => {
     saveData();   // 保存界面配置
     
    // 在这里执行脚本的主要流程
-   // main_process();
+   main_process();
 });
 
 
@@ -700,14 +697,14 @@ function the_total_processes(){
  * return: ture 返回成功，false 返回出错
  */
 function main_process(){
-    while( myAPP.taskCount < myAPP.totalNum && myAPP.isSuspend == false ){
-        log( "当前的任务：", taskCount );
+    var task_cnt = 0
+
+    while( task_cnt < myAPP.totalNum && myAPP.isSuspend == false ){
+        log( "当前的任务：", task_cnt );
 
         // 执行主要步骤
         the_total_processes();
-
-        taskCount ++;
-        
+        task_cnt++;
     }
 
     toastLog("任务已完成，结束脚本")
