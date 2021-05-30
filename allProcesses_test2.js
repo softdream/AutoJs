@@ -355,6 +355,8 @@ function click_ready_for_search(){
 function serch_the_users_and_click_in( nickName ){
     log("准备搜索：", nickName);
 
+    waitForActivity("com.bx.android.search.SearchActivity");
+
     var search = id("editText").findOne()
     if( search ){
         log( "找到了搜索输入框" );
