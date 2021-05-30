@@ -1,35 +1,38 @@
 //--------------- 定义一个全局变量 -----------------//
+setScreenMetrics(1080, 1920); //设置手机屏幕分辨率
+
 var myAPP = {};
 
 myAPP.title = "比心引流";// 脚本名称
 myAPP.packageName = "com.yitantech.gaigai";//程序包名
 myAPP.appVersion = "1.0.0";//APP版本
 
+// 任务计数
+myAPP.taskCount = 0;
+
 // 任务总数
-myAPP.totalNum = "5000";
+myAPP.totalNum = 5000;
 
 // 每执行多少个
-myAPP.every = "10";
+myAPP.every = 10;
 
 // 暂停的秒数
-myAPP.suspend = "60";
+myAPP.suspend = 60;
 
 // 最小延时1秒
-myAPP.delayMin = "1";
+myAPP.delayMin = 1;
 
 // 最大延时3秒
-myAPP.delayMax = "3";
+myAPP.delayMax = 3;
 
 // 寻找节点的超时时间，单位：毫秒
-myAPP.findTimeout = "1000";
+myAPP.findTimeout = 1000;
 
 // 任务的超时时间， 单位：毫秒
-myAPP.taskTimeout = "60000";
+myAPP.taskTimeout = 60000;
 
-
-setScreenMetrics(1080, 1920); //设置手机屏幕分辨率
-
-// 
+myAPP.isSuspend = false;
+//---------------- ---------------------------// 
 var nickNames = new Array();// 定义一个全局数组保存获取到的昵称
 var nicksNum = 0;
 
@@ -47,8 +50,8 @@ var nicksNum = 0;
 //click_to_chat();
 //goto_bosses_page();
 //send_test();
-return_to_main_page_from_search_page();
-//the_total_processes();
+//return_to_main_page_from_search_page();
+the_total_processes();
 
 
 /* 
@@ -171,7 +174,7 @@ function back_to_main_page(){
 
 /* 
  * description: 点击进入搜索框准备开始搜索
- * return: 无
+ * return: true 执行成功，false 执行失败
  */
 function click_ready_for_search(){
 
@@ -621,7 +624,7 @@ function send_test(){
 function the_total_processes(){
     // 1. 进入发现新老板页面
     if( goto_bosses_page() == false ){
-        return ;
+        return false;
     }
 
     // 2. 获取用户昵称
@@ -634,13 +637,15 @@ function the_total_processes(){
 
     // 3. 获取到昵称列表之后，返回到搜索框页面
     if( back_to_main_page() == false || nicksNum == 0){
-        return ;
+        return false;
     }
 
     sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
 
     // 4. 点击进入搜索框
-    click_ready_for_search();
+    if( click_ready_for_search() == false){
+        return false;
+    }
     sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
 
     // 5. 遍历昵称列表，对每个昵称执行以下操作
@@ -654,7 +659,9 @@ function the_total_processes(){
                 sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
 
                  // 8. 点击聊一聊
-                click_to_chat();
+                if( click_to_chat() == false){
+                    return false;
+                }
                 sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
 
                 // 9. 发送一个测试文本
@@ -662,15 +669,27 @@ function the_total_processes(){
                 sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
 
                 // 10. 回到搜索页面
-                exit_to_search_page_from_chat_page();
+                if( exit_to_search_page_from_chat_page() == false ){
+                    return false;
+                }
                 sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
             }
+            else {
+                return false;
+            }
+        }
+        else {
+            return false;
         }
     }
 
     //back()  /* return main page */
     // 11. 执行完一轮之后返回到主页面，准备下一次
-    return_to_main_page_from_search_page();
+    if( return_to_main_page_from_search_page() == false ){
+        return false;
+    }
+
+    return true;
 }
 /** TODO: 优化
  * 1. 把主页或其他上的几个控件写死在全局变量中，每次判断一下是否存在，不存在的话
@@ -685,3 +704,23 @@ function the_total_processes(){
  * 
  * 5.不知是否有api 函数可以代替sleep, 完成实时等待功能，而不是sleep盲目等待。
 */
+
+/* 
+ * description: 主任务流程
+ * parameter: None
+ * return: ture 返回成功，false 返回出错
+ */
+function main_process(){
+    while( myAPP.taskCount < myAPP.totalNum && myAPP.isSuspend == false ){
+        log( "当前的任务：", taskCount );
+
+        // 执行主要步骤
+        the_total_processes();
+
+        taskCount ++;
+        
+    }
+
+    toastLog("任务已完成，结束脚本")
+    exit();   //结束脚本
+} 
