@@ -422,122 +422,6 @@ function click_onto_first_user_found_by_searching(){
         return false;
 }
 
-/* 
- * description: 打开app后第一次进入发现新老板的步骤：点击”我的“按钮-->点击”大神专属“-->点击"发现新老板"
- * parameter: None
- * return: true 执行成功
- */
-function goto_find_bosses_page_first_time(){
-    //------------------ 首次打开程序后执行这个函数 ---------------------//
-
-    // 有时页面会跳出广告，需要处理掉
-    if(id("ivActivityImg").exists()){
-        log("出现了广告");
-        back(); //点一下返回键即可
-    }
-
-    // 点击我的按钮，进入“我的页面”
-    var my_page = id("bottomLabel").className("android.widget.TextView").text("我的").findOne()
-    if( my_page ){
-        log("找到我的按钮");
-        my_page.parent().click()
-        sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
-        //等待“我的页面"加载完成
-       // waitForActivity("com.android.systemui.recents.RecentsActivity");
-
-        // 点击大神专属按钮
-        if( id("rl_god_title").exists() ){
-            log("找到大神专属按钮");
-            id("rl_god_title").findOne().parent().click();
-            sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
-
-            // 等待大神专属页面加载成功
-
-            // 点击发现新老板
-            var find_boss = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOne()
-            if( find_boss ){
-                log("找到点击发现新老板按钮");
-                var x = find_boss.findOne().bounds().centerX();
-                var y = find_boss.findOne().bounds().centerY();
-                log("发现新老板按钮中心点: ", x, y);
-                var clickRet = click( x, y ); 
-                if( clickRet == true ){
-                    log("点击进入发现新老板界面");
-                    sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
-                    return true;
-                }
-                else{
-                    log("点击进入发现新老板界面失败了");
-                    return false;
-                }
-            }
-            else{
-                log("没找到点击发现新老板按钮");
-                return false;
-            }
-        }
-        else {
-            log("没找到大神专属按钮");
-            return false;
-        }
-    }
-    else {
-        log("没找到我的按钮");
-        return false;
-    }
-}
-
-/* 
- * description: 除了第一次之后进入”发现新老板“页面的步骤：点击”我的“按钮--> 点击”发现新老板“按钮
- * parameter: None
- * return: true 执行成功
- */
-function goto_bosses_page_not_first_time(){
-// 有时页面会跳出广告，需要处理掉
-    if(id("ivActivityImg").exists()){
-        log("出现了广告");
-        back(); //点一下返回键即可
-    }
-
-    // 点击我的按钮，进入“我的页面”
-    var my_page = id("bottomLabel").className("android.widget.TextView").text("我的").findOne()
-    if( my_page ){
-        log("找到我的按钮");
-        my_page.parent().click()
-        sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
-        //等待“我的页面"加载完成
-        // waitForActivity("com.android.systemui.recents.RecentsActivity");
-
-        // 点击发现新老板
-        var find_boss = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOne()
-        if( find_boss ){
-            log("找到点击发现新老板按钮");
-            var x = find_boss.findOne().bounds().centerX();
-            var y = find_boss.findOne().bounds().centerY();
-            log("发现新老板按钮中心点: ", x, y);
-
-            var clickRet = click( x, y ); 
-            if( clickRet == true ){
-                log("点击进入发现新老板界面");
-                sleep(random( myAPP.delayMin, myAPP.delayMax ) * 1000); //随机延时
-                return true;
-            }
-            else{
-                log("点击进入发现新老板界面失败了");
-                return false;
-            }
-
-        }
-        else{
-            log("没找到点击发现新老板按钮");
-            return false;
-        }
-    }
-    else{
-        log("没找到我的按钮");
-        return false;
-    }
-}
 
 /* 
  * description: 进入”发现新老板“，自动判断是否需要点击”大神专属“按钮
@@ -738,6 +622,26 @@ function return_to_main_page_from_search_page(){
  */
 function send_test(){
     id("tvQuickMsg").className("android.widget.TextView").findOne().parent().click();
+}
+
+/* 点击聊一聊之后，应该使用以下命令，等待聊天窗口出现，
+ *  然后去执行send_msg函数
+ */
+// waitForActivity("com.bx.im.P2PMessageActivity")
+/* 函数用来向特定的boss发送随机话术msg */
+function send_msg(nick_name, msg)
+{
+    /* 判断是否在和nick_name聊天 */
+    if(id("uf_txv_title").findOne().text() == nick_name){
+
+        setText(msg)        /* 聊天框填入信息 */
+        random(100, 500)    /* 随机延时100 - 500 ms */
+        id("tvSendMessage").findOne().parent().click()
+        random(100, 500)    /* 随机延时100 - 500 ms */
+    } 
+    else {
+        log("不在与boss(" + nick_name + ")聊天界面")
+    }
 }
 
 /* 
