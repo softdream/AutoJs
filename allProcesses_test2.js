@@ -262,9 +262,11 @@ function delStorageData(name, key) {
  */
 function total_process(){
     goto_bosses_page();
-    scroll_up();
-    // random(3000, 5000)
+
+    sleep(2000)
+    scroll_up()
     sleep(1000)
+
     nickNames = get_nick_name_list(myAPP.usersNum);
     log("昵称个数：", nicksNum);
     back_to_main_page();
@@ -303,8 +305,10 @@ function get_nick_name_list(target_num) {
         var object = className("android.widget.Button").find()
 
         while (target_num > object.length) {
-            scroll_up()
+            // scroll_up()
+            swipe( 640,  1930, 640, 313, 1000)
             sleep(1000);
+            swipe( 640,  1130, 640, 1330, 1000)
             object = null
             object = className("android.widget.Button").find()
         }
@@ -343,7 +347,6 @@ function scroll_up() {
     //开始翻页
     // 从小往上滑动屏幕
     swipe( 640,  1930, 640, 313, 1000);// 根据坐标值来翻页
-    sleep(2000);
 }
 
 /* 
@@ -694,16 +697,18 @@ function send_msg(nick_name, msg)
     if(id("uf_txv_title").findOne().text() == nick_name){
 
         setText(msg)        /* 聊天框填入信息 */
-        random(100, 500)    /* 随机延时100 - 500 ms */
+        var time = random(100, 500)    /* 随机延时100 - 500 ms */
+        sleep(time)
         id("tvSendMessage").findOne().parent().click()
-        random(100, 500)    /* 随机延时100 - 500 ms */
+        var time = random(100, 500)    /* 随机延时100 - 500 ms */
+        sleep(time)
     } 
     else {
         log("不在与boss(" + nick_name + ")聊天界面")
     }
 }
 
-/* 
+/* NOTE: 这个函数暂时不用
  * description: 总流程
  * parameter: None
  * return: ture 返回成功，false 返回出错
