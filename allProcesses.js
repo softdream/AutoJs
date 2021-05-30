@@ -109,12 +109,12 @@ function back_to_main_page(){
             log("点击按钮失败");
             return false;
         }
+        /* TODO 这段代码都执行不到，上面的if else 都会return出去 */
         // 有时页面会跳出广告，需要处理掉
         if(id("ivActivityImg").exists()){
             log("出现了广告");
             back(); //点一下返回键即可
         }
-
     }
     else {
         log("没找到按钮")
@@ -190,7 +190,7 @@ function serch_the_users_and_click_in( nickName ){
             }
         }
         else {
-            log("未能输入昵称");
+            log("输入昵称失败");
             return false;
         }
     }
@@ -236,12 +236,14 @@ function click_onto_first_user_found_by_searching(){
 
 
     log("找到了第一个用户");
-    var clickRet = id("subList").findOne().children().findOne( id("nameTv") ).parent().click();
+    // var clickRet = id("subList").findOne().children().findOne( id("nameTv") ).parent().click();
 
-    if( clickRet == true ) 
-        return true;
-    else 
-        return false;
+    // if( clickRet == true ) 
+    //     return true;
+    // else 
+    //     return false;
+
+    return id("subList").findOne().children().findOne( id("nameTv") ).parent().click()
 }
 
 /* 
@@ -259,9 +261,10 @@ function goto_find_bosses_page_first_time(){
     }
 
     // 点击我的按钮，进入“我的页面”
-    if( id("bottomLabel").className("android.widget.TextView").text("我的").exists() ){
+    var my_page = id("bottomLabel").className("android.widget.TextView").text("我的").findOne()
+    if( my_page ){
         log("找到我的按钮");
-        id("bottomLabel").className("android.widget.TextView").text("我的").findOne().parent().click()
+        my_page.parent().click()
 
         //等待“我的页面"加载完成
        // waitForActivity("com.android.systemui.recents.RecentsActivity");
@@ -274,11 +277,11 @@ function goto_find_bosses_page_first_time(){
             // 等待大神专属页面加载成功
 
             // 点击发现新老板
-            if( id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").exists() ){
+            var find_boss = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOne()
+            if( find_boss != null ){
                 log("找到点击发现新老板按钮");
-                //id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOne().click();
-                var x = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOne().bounds().centerX();
-                var y = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOne().bounds().centerY();
+                var x = find_boss.findOne().bounds().centerX();
+                var y = find_boss.findOne().bounds().centerY();
                 log("发现新老板按钮中心点: ", x, y);
                 var clickRet = click( x, y ); 
                 if( clickRet == true ){
@@ -327,11 +330,11 @@ function goto_bosses_page_not_first_time(){
        // waitForActivity("com.android.systemui.recents.RecentsActivity");
 
        // 点击发现新老板
-        if( id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").exists() ){
+       var find_boss = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOne()
+        if( find_boss != null ){
             log("找到点击发现新老板按钮");
-            //id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOne().click();
-            var x = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOne().bounds().centerX();
-            var y = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOne().bounds().centerY();
+            var x = find_boss.findOne().bounds().centerX();
+            var y = find_boss.findOne().bounds().centerY();
             log("发现新老板按钮中心点: ", x, y);
 
             var clickRet = click( x, y ); 
