@@ -275,7 +275,7 @@ function total_process(){
     for( var i = 0; i < nicksNum; i ++ ){
 
         serch_the_users_and_click_in(nickNames[i]);
-        click_onto_first_user_found_by_searching();
+        click_onto_first_user_found_by_searching(nickNames[i]);
         click_to_chat();
         send_test();
         sleep(1000);
@@ -460,8 +460,6 @@ function serch_the_users_and_click_in( nickName ){
                 var y = search_bt.bounds().centerY();
                 // log("搜索按钮中心点: ", x, y);
                 var clickRet = click( x, y );  
-
-                log( clickRet );
                 if( clickRet == true ){
                     log("点击搜索成功");
                     sleep(1000)
@@ -493,26 +491,27 @@ function serch_the_users_and_click_in( nickName ){
  * parameter: None
  * return: 无
  */
-function click_onto_first_user_found_by_searching(){
-   /* id("subList").findOne().children().forEach(child => {
-        var target = child.findOne(id("nameTv"));
-        target.parent().click();
-        });*/
+function click_onto_first_user_found_by_searching(nick_name){
+
     if( id("title").text("相关用户").exists ){
 
-        log("找到了第一个用户");
-        var clickRet = id("subList").findOne().children().findOne( id("nameTv") ).parent().click();
+        log("正在查找用户");
+        var user_list = id("nameTv").find()
 
-        if( clickRet == true ) {
-            sleep(1000)
-            return true;
+        for (var i = 0; i < user_list.length; i++) {
+            if (user_list[i].text() == nick_name) {
+                user_list[i].parent().click()
+                log(user_list[i].text())
+                return true;
+            }
         }
-        else 
-            return false;
-    }      
-    else {
-        return false;
+        /*实在找不到 就发给第一个人*/
+        id("subList").findOne().children().findOne( id("nameTv") ).parent().click()
+        log("没找到该用户，只能发给第一个用户: "+ user_list[0].text())
+        return true
     }
+
+    return false;
 }
 
 
@@ -635,6 +634,7 @@ function click_to_chat(){
 function exit_to_search_page_from_chat_page(){
     waitForActivity("com.bx.im.P2PMessageActivity");
     back();
+    sleep(500)
 
     /* 如果回退到boss主页，两种情况（关注/未关注） */
     if( id("chat").exists() || id("userChatFollow").exists()){
@@ -645,8 +645,21 @@ function exit_to_search_page_from_chat_page(){
             log("回到了搜索页面");
             return true;
         }
-        else return false;
-        /* 如果没有回退到搜索页面，最好再去尝试一下 */
+        else {
+            /* 如果没有回退到搜索页面，且处于boss主页，则再去尝试一下back */
+            if( id("chat").exists() || id("userChatFollow").exists()) {
+                back();
+                sleep(500)
+            } else {
+                return false
+            }
+
+            if( id("toolbarButtonText").className("android.widget.TextView").text("搜索").exists() ){
+                log("回到了搜索页面");
+                return true;
+            }
+            return false;
+        }
     }
 }
 
