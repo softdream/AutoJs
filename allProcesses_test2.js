@@ -295,6 +295,7 @@ function total_process(){
  */
 function get_nick_name_list(target_num) {
     var nick_name_list = new Array()
+    sleep(2000)
 
     log("Get Nick Name List ...");
     waitForActivity("com.bx.h5.BxH5Activity");
@@ -495,22 +496,22 @@ function click_onto_first_user_found_by_searching(nick_name){
 
     if( id("title").text("相关用户").exists ){
 
-        log("正在查找用户");
-        var user_list = id("nameTv").find()
+        // log("正在查找用户");
+        // var user_list = id("nameTv").find()
 
-        for (var i = 0; i < user_list.length; i++) {
-            var user = user_list.get(i)
-            var user_name = user.text()
+        // for (var i = 0; i < user_list.length; i++) {
+        //     var user = user_list.get(i)
+        //     var user_name = user.text()
 
-            if (user_name == nick_name) {
-                user.parent().click()
-                log(user_name)
-                return true;
-            }
-        }
+        //     if (user_name == nick_name) {
+        //         user.parent().click()
+        //         log(user_name)
+        //         return true;
+        //     }
+        // }
         /*实在找不到 就发给第一个人*/
         id("subList").findOne().children().findOne( id("nameTv") ).parent().click()
-        log("没找到该用户，只能发给第一个用户: "+ user_list[0].text())
+        // log("没找到该用户，只能发给第一个用户: "+ user_list[0].text())
         return true
     }
 
