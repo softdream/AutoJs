@@ -523,10 +523,15 @@ function click_onto_first_user_found_by_searching(nick_name){
 function goto_bosses_page()
 {
     // 有时页面会跳出广告，需要处理掉
-    if(id("ivActivityView").exists()){
+    var img = id("ivActivityImg").exists()
+    if ( img ) {
         log("出现了广告");
-        id("ivCloseDialog").click()
+        back()
     }
+    // else if(id("ivActivityView").exists()) {
+    //     log("出现了广告");
+    //     id("ivCloseDialog").click()
+    // }
 
     // 点击我的按钮，进入“我的页面”
     var my_page = id("bottomLabel").className("android.widget.TextView").text("我的").findOnce(0)
@@ -550,7 +555,8 @@ function goto_bosses_page()
 
         if( id("toolbarTitle").text("大神").exists() ){
             log("进入大神界面");
-
+            /* 把发现新老板选项 暴露出来 */
+            swipe( 640,  1530, 640, 1430, 1000)
             // 点击发现新老板
             var find_boss = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOnce(0)
             if( find_boss != null ){
