@@ -499,9 +499,12 @@ function click_onto_first_user_found_by_searching(nick_name){
         var user_list = id("nameTv").find()
 
         for (var i = 0; i < user_list.length; i++) {
-            if (user_list[i].text() == nick_name) {
-                user_list[i].parent().click()
-                log(user_list[i].text())
+            var user = user_list.get(i)
+            var user_name = user.text()
+
+            if (user_name == nick_name) {
+                user.parent().click()
+                log(user_name)
                 return true;
             }
         }
@@ -556,7 +559,7 @@ function goto_bosses_page()
         if( id("toolbarTitle").text("大神").exists() ){
             log("进入大神界面");
             /* 把发现新老板选项 暴露出来 */
-            swipe( 640,  1530, 640, 1430, 1000)
+            swipe( 640,  1530, 640, 1130, 1000)
             // 点击发现新老板
             var find_boss = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOnce(0)
             if( find_boss != null ){
