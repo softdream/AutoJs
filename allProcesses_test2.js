@@ -275,7 +275,7 @@ function total_process(){
     for( var i = 0; i < nicksNum; i ++ ){
 
         serch_the_users_and_click_in(nickNames[i]);
-        click_onto_first_user_found_by_searching();
+        click_onto_first_user_found_by_searching(nickNames[i]);
         click_to_chat();
         send_test();
         sleep(1000);
@@ -295,6 +295,7 @@ function total_process(){
  */
 function get_nick_name_list(target_num) {
     var nick_name_list = new Array()
+    sleep(2000)
 
     log("Get Nick Name List ...");
     waitForActivity("com.bx.h5.BxH5Activity");
@@ -460,8 +461,6 @@ function serch_the_users_and_click_in( nickName ){
                 var y = search_bt.bounds().centerY();
                 // log("搜索按钮中心点: ", x, y);
                 var clickRet = click( x, y );  
-
-                log( clickRet );
                 if( clickRet == true ){
                     log("点击搜索成功");
                     sleep(1000)
@@ -493,26 +492,30 @@ function serch_the_users_and_click_in( nickName ){
  * parameter: None
  * return: 无
  */
-function click_onto_first_user_found_by_searching(){
-   /* id("subList").findOne().children().forEach(child => {
-        var target = child.findOne(id("nameTv"));
-        target.parent().click();
-        });*/
+function click_onto_first_user_found_by_searching(nick_name){
+
     if( id("title").text("相关用户").exists ){
 
-        log("找到了第一个用户");
-        var clickRet = id("subList").findOne().children().findOne( id("nameTv") ).parent().click();
+        // log("正在查找用户");
+        // var user_list = id("nameTv").find()
 
-        if( clickRet == true ) {
-            sleep(1000)
-            return true;
-        }
-        else 
-            return false;
-    }      
-    else {
-        return false;
+        // for (var i = 0; i < user_list.length; i++) {
+        //     var user = user_list.get(i)
+        //     var user_name = user.text()
+
+        //     if (user_name == nick_name) {
+        //         user.parent().click()
+        //         log(user_name)
+        //         return true;
+        //     }
+        // }
+        /*实在找不到 就发给第一个人*/
+        id("subList").findOne().children().findOne( id("nameTv") ).parent().click()
+        // log("没找到该用户，只能发给第一个用户: "+ user_list[0].text())
+        return true
     }
+
+    return false;
 }
 
 
@@ -524,10 +527,15 @@ function click_onto_first_user_found_by_searching(){
 function goto_bosses_page()
 {
     // 有时页面会跳出广告，需要处理掉
-    if(id("ivActivityView").exists()){
+    var img = id("ivActivityImg").exists()
+    if ( img ) {
         log("出现了广告");
-        id("ivCloseDialog").click()
+        back()
     }
+    // else if(id("ivActivityView").exists()) {
+    //     log("出现了广告");
+    //     id("ivCloseDialog").click()
+    // }
 
     // 点击我的按钮，进入“我的页面”
     var my_page = id("bottomLabel").className("android.widget.TextView").text("我的").findOnce(0)
@@ -551,7 +559,8 @@ function goto_bosses_page()
 
         if( id("toolbarTitle").text("大神").exists() ){
             log("进入大神界面");
-
+            /* 把发现新老板选项 暴露出来 */
+            swipe( 640,  1530, 640, 1130, 1000)
             // 点击发现新老板
             var find_boss = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOnce(0)
             if( find_boss != null ){
@@ -635,6 +644,7 @@ function click_to_chat(){
 function exit_to_search_page_from_chat_page(){
     waitForActivity("com.bx.im.P2PMessageActivity");
     back();
+    sleep(500)
 
     /* 如果回退到boss主页，两种情况（关注/未关注） */
     if( id("chat").exists() || id("userChatFollow").exists()){
@@ -645,8 +655,21 @@ function exit_to_search_page_from_chat_page(){
             log("回到了搜索页面");
             return true;
         }
-        else return false;
-        /* 如果没有回退到搜索页面，最好再去尝试一下 */
+        else {
+            /* 如果没有回退到搜索页面，且处于boss主页，则再去尝试一下back */
+            if( id("chat").exists() || id("userChatFollow").exists()) {
+                back();
+                sleep(500)
+            } else {
+                return false
+            }
+
+            if( id("toolbarButtonText").className("android.widget.TextView").text("搜索").exists() ){
+                log("回到了搜索页面");
+                return true;
+            }
+            return false;
+        }
     }
 }
 
@@ -686,26 +709,26 @@ function send_test(){
     id("tvQuickMsg").className("android.widget.TextView").findOne().parent().click();
 }
 
-/* 点击聊一聊之后，应该使用以下命令，等待聊天窗口出现，
- *  然后去执行send_msg函数
- */
-// waitForActivity("com.bx.im.P2PMessageActivity")
-/* 函数用来向特定的boss发送随机话术msg */
-function send_msg(nick_name, msg)
+/* 点击聊一聊之后，应该使用以下命令，等待聊天窗口出现，
+ *  然后去执行send_msg函数
+ */
+// waitForActivity("com.bx.im.P2PMessageActivity")
+/* 函数用来向特定的boss发送随机话术msg */
+function send_msg(nick_name, msg)
 {
-    /* 判断是否在和nick_name聊天 */
-    if(id("uf_txv_title").findOne().text() == nick_name){
+    /* 判断是否在和nick_name聊天 */
+    if(id("uf_txv_title").findOne().text() == nick_name){
 
-        setText(msg)        /* 聊天框填入信息 */
-        var time = random(100, 500)    /* 随机延时100 - 500 ms */
+        setText(msg)        /* 聊天框填入信息 */
+        var time = random(100, 500)    /* 随机延时100 - 500 ms */
         sleep(time)
-        id("tvSendMessage").findOne().parent().click()
-        var time = random(100, 500)    /* 随机延时100 - 500 ms */
+        id("tvSendMessage").findOne().parent().click()
+        var time = random(100, 500)    /* 随机延时100 - 500 ms */
         sleep(time)
-    } 
-    else {
-        log("不在与boss(" + nick_name + ")聊天界面")
-    }
+    } 
+    else {
+        log("不在与boss(" + nick_name + ")聊天界面")
+    }
 }
 
 /* NOTE: 这个函数暂时不用
