@@ -300,6 +300,9 @@ function get_nick_name_list(target_num) {
     log("Get Nick Name List ...");
     waitForActivity("com.bx.h5.BxH5Activity");
 
+    // 等待发现新老板控件出现
+    className("android.view.View").text("发现老板").waitFor();
+
     /* 判断当前是否处于发现老板界面 */
     if(className("android.view.View").text("发现老板").exists()){
         /* 获取发现老板界面中，所有的boss集合 */
