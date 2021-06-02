@@ -310,9 +310,9 @@ function get_nick_name_list(target_num) {
 
         while (target_num > object.length) {
             // scroll_up()
-            swipe( 640,  1930, 640, 313, 1000)
+            swipe( 640,  1930, 640, 313, 800)
             sleep(1000);
-            swipe( 640,  1130, 640, 1330, 1000)
+            swipe( 640,  1130, 640, 1330, 800)
             object = null
             object = className("android.widget.Button").find()
         }
@@ -379,7 +379,12 @@ function refresh_page()
  * return: 无
  */
 function back_to_main_page(){
-    back(); // 在老板页面先点击返回按钮
+   // back(); // 在老板页面先点击返回按钮
+    
+    // 修改
+    if( className("android.view.View").desc("").exists() ){
+        className("android.view.View").desc("").findOne().click();
+    }
 
     waitForActivity("com.bx.main.MainActivity"); // 等待页面出现
 
@@ -434,6 +439,7 @@ function click_ready_for_search(){
     }
     else {
         log("没找到搜索框")
+        toastLog("没找到搜索框");
         return false;
     }
 }
@@ -471,21 +477,25 @@ function serch_the_users_and_click_in( nickName ){
                 }
                 else {
                     log("点击搜索失败");
+                    toastLog("点击搜索失败");
                     return false;
                 }
             }
             else {
                 log("没找到搜索按钮");
+                toastLog("没找到搜索按钮");
                 return false;
             }
         }
         else {
             log("未能输入昵称");
+            toastLog("未能输入昵称");
             return false;
         }
     }
     else {
         log("没找到搜索输入框");
+        toastLog("没找到搜索输入框");
         return false;
     }
 }
@@ -556,8 +566,10 @@ function goto_bosses_page()
             log(god_only.parent().click())
             log("在user页")
             sleep(1000)
-        } else {
+        } 
+        else {
             log("不在User页面")     //虽然不在user页面，但是有可能已经在大神页面了
+            toastLog("不在User页面");
         }
 
         if( id("toolbarTitle").text("大神").exists() ){
@@ -580,18 +592,22 @@ function goto_bosses_page()
                 }
                 else{
                     log("点击进入发现新老板界面失败了");
+                    toastLog("点击进入发现新老板界面失败了");
                 }
             }
             else{
                 log("没找到点击发现新老板按钮");
+                toastLog("没找到点击发现新老板按钮");
             }
         }
         else{
             log("也不在大神页面");
+            toastLog("也不在大神页面");
         }
     }
     else {
         log("没找到我的按钮");
+        toastLog("没找到我的按钮");
         return false;
     }
 }
@@ -635,6 +651,7 @@ function click_to_chat(){
     }
     else {
         log("没找到聊一聊按钮");
+        toastLog("没找到聊一聊按钮");
         return false;
     }
 }
@@ -696,10 +713,12 @@ function return_to_main_page_from_search_page(){
         }
         else {
             log("不在主页面");
+            toastLog("不在主页面");
         }
     }
     else{
         log("不在搜索页面");
+        toastLog("不在搜索页面");
     }
 }
 
@@ -731,6 +750,7 @@ function send_msg(nick_name, msg)
     } 
     else {
         log("不在与boss(" + nick_name + ")聊天界面")
+        toastLog("不在与boss(" + nick_name + ")聊天界面");
     }
 }
 
@@ -757,6 +777,7 @@ function the_total_processes(){
     // 3. 获取到昵称列表之后，返回到搜索框页面
     if( back_to_main_page() == false || nicksNum == 0){
         log("step 3 err")
+        toastLog("step 3 err");
         return false;
     }
 
