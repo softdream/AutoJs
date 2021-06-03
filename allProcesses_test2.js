@@ -387,6 +387,8 @@ function back_to_main_page(){
     /* 找不到回退控件之后，再尝试使用back */
     if( className("android.view.View").text("").exists() ){
         className("android.view.View").text("").findOne().click()
+        log("点击back")
+        toastLog("点击back")
     } else {
         log("回退控件没有找到")
         toastLog("回退控件没有找到")
@@ -815,6 +817,7 @@ function the_total_processes(){
     /* 昵称参数，可以在UI中设置一个变量，用来传输 */
     nickNames = get_nick_name_list(myAPP.usersNum);
     log("昵称个数：", nicksNum);
+    toastLog("boss num" + nicksNum)
 
     // 3. 获取到昵称列表之后，返回到搜索框页面
     if( back_to_main_page() == false || nicksNum == 0){
