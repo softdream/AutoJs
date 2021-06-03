@@ -307,14 +307,18 @@ function get_nick_name_list(target_num) {
     if(className("android.view.View").text("发现老板").exists()){
         /* 获取发现老板界面中，所有的boss集合 */
         var object = className("android.widget.Button").find()
-
+        var cnt = 0;
         while (target_num > object.length) {
             // scroll_up()
-            swipe( 640,  1930, 640, 313, 800)
+            swipe( 640,  1930, 640, 513, 300)
             sleep(1000);
-            swipe( 640,  1130, 640, 1330, 800)
+            swipe( 640,  1130, 640, 1330, 500)
+            sleep(500)
             object = null
             object = className("android.widget.Button").find()
+            cnt++;
+            if (cnt >= 10)
+                break
         }
 
         log("实际获得老板个数: " + object.length)
@@ -379,11 +383,14 @@ function refresh_page()
  * return: 无
  */
 function back_to_main_page(){
-   // back(); // 在老板页面先点击返回按钮
     
-    // 修改
-    if( className("android.view.View").desc("").exists() ){
-        className("android.view.View").desc("").findOne().click();
+    /* 找不到回退控件之后，再尝试使用back */
+    if( className("android.view.View").text("").exists() ){
+        className("android.view.View").text("").findOne().click()
+    } else {
+        log("回退控件没有找到")
+        toastLog("回退控件没有找到")
+        back()
     }
 
     waitForActivity("com.bx.main.MainActivity"); // 等待页面出现
@@ -575,7 +582,7 @@ function goto_bosses_page()
         if( id("toolbarTitle").text("大神").exists() ){
             log("进入大神界面");
             /* 把发现新老板选项 暴露出来 */
-            swipe( 640,  1530, 640, 1130, 1000)
+            swipe( 640,  1530, 640, 1330, 500)
             // 点击发现新老板
             var find_boss = id("tvGodNewbieItemFuncTitle").className("android.widget.TextView").text("发现新老板").findOnce(0)
             if( find_boss != null ){
@@ -587,7 +594,7 @@ function goto_bosses_page()
 
                 if( click( x, y ) ){
                     log("点击进入发现新老板界面");
-                    sleep(1000)
+                    sleep(2000)
                     return true;
                 }
                 else{
@@ -663,12 +670,32 @@ function click_to_chat(){
  */
 function exit_to_search_page_from_chat_page(){
     waitForActivity("com.bx.im.P2PMessageActivity");
-    back();
+    /* 使用控件来回退 */
+    if(id("toolbarButtonText").className("android.widget.TextView").text("").exists()){
+        id("toolbarButtonText").className("android.widget.TextView").text("").findOne().parent().parent().parent().click()
+        log("点击back")
+        toastLog("点击back")
+    } else {
+        log("回退控件没找到")
+        toastLog("回退控件没找到")
+        back()  
+    }
+
     sleep(500)
 
     /* 如果回退到boss主页，两种情况（关注/未关注） */
     if( id("chat").exists() || id("userChatFollow").exists()){
-        back();
+        /* 使用控件来回退 */
+        if(id("toolbarButtonText").className("android.widget.TextView").text("").exists()){
+            id("toolbarButtonText").className("android.widget.TextView").text("").findOne().parent().parent().parent().click()
+            log("点击back")
+            toastLog("点击back")
+        } else {
+            log("回退控件没找到")
+            toastLog("回退控件没找到")
+            back();
+        }
+
         sleep(500)
 
         if( id("toolbarButtonText").className("android.widget.TextView").text("搜索").exists() ){
@@ -678,7 +705,15 @@ function exit_to_search_page_from_chat_page(){
         else {
             /* 如果没有回退到搜索页面，且处于boss主页，则再去尝试一下back */
             if( id("chat").exists() || id("userChatFollow").exists()) {
-                back();
+                if(id("toolbarButtonText").className("android.widget.TextView").text("").exists()){
+                    id("toolbarButtonText").className("android.widget.TextView").text("").findOne().parent().parent().parent().click()
+                    log("点击back")
+                    toastLog("点击back")
+                } else {
+                    log("回退控件没找到")
+                    toastLog("回退控件没找到")
+                    back();
+                }
                 sleep(500)
             } else {
                 return false
@@ -703,7 +738,14 @@ function return_to_main_page_from_search_page(){
     if(id("toolbarButtonText").className("android.widget.TextView").text("搜索").exists()){
         //如果在搜索页面，则执行back     
         log("在搜索页面"); 
-        back();
+        if(id("toolbarButtonText").className("android.widget.TextView").text("").exists()){
+            log(id("toolbarButtonText").className("android.widget.TextView").text("").findOne().parent().parent().parent().click())
+            log("点击back")
+            toastLog("点击back")
+        } else {
+            back();
+        }
+
         sleep(500)
         // 返回之后判断一下在不在主页面
         if(id("bottomLabel").className("android.widget.TextView").text("比心").exists()){
